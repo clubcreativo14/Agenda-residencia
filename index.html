@@ -765,138 +765,12 @@
     letter-spacing: 0.08em;
   }
 
-  /* ── REGISTRO OVERLAY ── */
-  #registro-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--ink);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    animation: fadeIn 0.3s ease;
-  }
-  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-  @keyframes slideUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
-
-  .registro-box {
-    background: var(--warm-white);
-    border-radius: 24px;
-    padding: 40px 36px;
-    max-width: 420px;
-    width: 100%;
-    animation: slideUp 0.4s ease 0.1s both;
-    position: relative;
-    overflow: hidden;
-  }
-  .registro-box::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 200px; height: 200px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--rust) 0%, transparent 70%);
-    opacity: 0.12;
-    pointer-events: none;
-  }
-  .registro-emoji { font-size: 40px; margin-bottom: 16px; display: block; }
-  .registro-box h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    line-height: 1.15;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
-  }
-  .registro-box h2 em { font-style: italic; color: var(--rust); }
-  .registro-box p {
-    font-size: 14px;
-    color: var(--ink-light);
-    opacity: 0.65;
-    margin-bottom: 28px;
-    line-height: 1.5;
-  }
-  .registro-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-  .registro-field label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    opacity: 0.6;
-  }
-  .registro-field input {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    color: var(--ink);
-    background: var(--cream);
-    border: 1.5px solid var(--border);
-    border-radius: 12px;
-    padding: 12px 16px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    width: 100%;
-  }
-  .registro-field input:focus {
-    border-color: var(--rust);
-    box-shadow: 0 0 0 3px rgba(196,92,58,0.1);
-  }
-  .registro-error {
-    font-size: 12px;
-    color: var(--rust);
-    margin-top: -8px;
-    margin-bottom: 8px;
-    display: none;
-  }
-  .btn-registro {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    color: white;
-    background: var(--rust);
-    border: none;
-    border-radius: 12px;
-    padding: 14px 28px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 8px;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    box-shadow: 0 4px 14px rgba(196,92,58,0.3);
-    letter-spacing: 0.02em;
-  }
-  .btn-registro:hover { background: var(--blush); transform: translateY(-1px); }
-  .btn-registro:active { transform: translateY(0); }
-  .btn-registro:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .registro-nota {
-    font-size: 11px;
-    color: var(--ink-light);
-    opacity: 0.4;
-    text-align: center;
-    margin-top: 14px;
-    line-height: 1.5;
-  }
+  
 </style>
 </head>
 <body>
 
-<!-- ── OVERLAY DE REGISTRO ── -->
-<div id="registro-overlay">
-  <div class="registro-box">
-    <span class="registro-emoji">📓</span>
-    <h2>Bienvenida a tu<br><em>Agenda</em></h2>
-    <p>Escribí tu nombre y tocá <strong>Listo</strong> en el teclado.</p>
-    <form id="reg-form" action="javascript:void(0)" onsubmit="registrarUsuaria()">
-      <div class="registro-field">
-        <label>Tu nombre completo</label>
-        <input type="text" id="reg-nombre" placeholder="Ej: María González" autocomplete="name" autocorrect="off" />
-      </div>
-      <div class="registro-error" id="reg-error">Por favor escribí tu nombre para continuar.</div>
-      <input type="submit" class="btn-registro" id="reg-btn" value="Entrar a mi agenda →" />
-    </form>
-    <p class="registro-nota">Solo se registra tu nombre y la fecha de acceso.<br>Tu agenda es completamente privada.</p>
-  </div>
-</div>
+
 
 <header>
   <div class="header-accent"></div>
@@ -1326,47 +1200,7 @@
 <div class="footer-note">agenda de residencia docente · creado por <strong style="opacity:0.7;font-style:italic">Club Creativo</strong></div>
 
 <script>
-var FORMSPREE_URL = 'https://formspree.io/f/mvzlykzo';
 
-// ── REGISTRO ──
-function registrarUsuaria() {
-  var nombre = document.getElementById('reg-nombre').value.trim();
-  var errorEl = document.getElementById('reg-error');
-  var btn = document.getElementById('reg-btn');
-  if (!nombre) {
-    errorEl.style.display = 'block';
-    document.getElementById('reg-nombre').focus();
-    return;
-  }
-  errorEl.style.display = 'none';
-  localStorage.setItem('agenda_usuaria', nombre);
-  var ahora = new Date();
-  var dia = ahora.getDate() < 10 ? '0'+ahora.getDate() : ''+ahora.getDate();
-  var mes = (ahora.getMonth()+1) < 10 ? '0'+(ahora.getMonth()+1) : ''+(ahora.getMonth()+1);
-  var anio = ahora.getFullYear();
-  var hh = ahora.getHours() < 10 ? '0'+ahora.getHours() : ''+ahora.getHours();
-  var mm = ahora.getMinutes() < 10 ? '0'+ahora.getMinutes() : ''+ahora.getMinutes();
-  var fecha = dia+'/'+mes+'/'+anio;
-  var hora = hh+':'+mm;
-  btn.disabled = true;
-  btn.textContent = 'Entrando...';
-  if (window.location.protocol !== 'file:') {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', FORMSPREE_URL, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.send(JSON.stringify({nombre: nombre, fecha: fecha, hora: hora}));
-  }
-  document.getElementById('registro-overlay').style.display = 'none';
-}
-
-function verificarRegistro() {
-  try {
-    var nombre = localStorage.getItem('agenda_usuaria');
-    if (nombre) {
-      var overlay = document.getElementById('registro-overlay');
-      if (overlay) overlay.style.display = 'none';
-    }
   } catch(e) {}
 }
 
@@ -1728,28 +1562,28 @@ function guardarAprendizaje() {
 // ── INIT ──
 window.onload = function() {
   try { setDefaultDates(); } catch(e) {}
-  try { verificarRegistro(); } catch(e) {}
   try { restaurarDatos(); } catch(e) {}
   try { bindIdeasTextareas(); } catch(e) {}
-
-  var btn = document.getElementById('reg-btn');
-  if (btn) {
-    btn.addEventListener('click', function() {
-      registrarUsuaria();
-    });
-    btn.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      registrarUsuaria();
-    });
-  }
-
-  var regInput = document.getElementById('reg-nombre');
-  if (regInput) {
-    regInput.addEventListener('keydown', function(e) {
-      if (e.keyCode === 13) registrarUsuaria();
-    });
-  }
-};
+  try {
+    var usuaria = localStorage.getItem('agenda_usuaria');
+    if (!usuaria) {
+      var nombre = prompt('Bienvenida a tu Agenda de Residencia \n\nEscribí tu nombre para continuar:');
+      if (nombre && nombre.trim() !== '') {
+        localStorage.setItem('agenda_usuaria', nombre.trim());
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'https://formspree.io/f/mvzlykzo', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.setRequestHeader('Accept', 'application/json');
+        var ahora = new Date();
+        var dia = ahora.getDate() < 10 ? '0'+ahora.getDate() : ''+ahora.getDate();
+        var mes = (ahora.getMonth()+1) < 10 ? '0'+(ahora.getMonth()+1) : ''+(ahora.getMonth()+1);
+        var anio = ahora.getFullYear();
+        var hh = ahora.getHours() < 10 ? '0'+ahora.getHours() : ''+ahora.getHours();
+        var mm = ahora.getMinutes() < 10 ? '0'+ahora.getMinutes() : ''+ahora.getMinutes();
+        xhr.send(JSON.stringify({nombre: nombre.trim(), fecha: dia+'/'+mes+'/'+anio, hora: hh+':'+mm}));
+      }
+    }
+  } catch(e) {};
 </script>
 </body>
 </html>
