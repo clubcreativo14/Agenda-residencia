@@ -1519,7 +1519,7 @@ function agregarFrase() {
   var list = document.getElementById('frases-lista');
   var item = document.createElement('div');
   item.className = 'frase-item';
-  item.innerHTML = '<div class="frase-quote">&ldquo;</div><div class="frase-text">'+val+'</div><button class="btn-delete">\u2715</button>';
+  item.innerHTML = '<div class="frase-quote">"</div><div class="frase-text">'+val+'</div><button class="btn-delete">\u2715</button>';
   item.querySelector('.btn-delete').onclick = function() {
     item.parentNode.removeChild(item);
     persistirInspiracion();
@@ -1531,7 +1531,7 @@ function agregarFrase() {
 
 // ── FECHA ──
 function fmtFecha(dateStr) {
-  if (!dateStr) return '&mdash;';
+  if (!dateStr) return '—';
   var parts = dateStr.split('-');
   return parts[2]+'/'+parts[1]+'/'+parts[0];
 }
@@ -1570,9 +1570,9 @@ function guardarObservacion() {
   var mood = clima ? moods[clima] : '';
   var tags = '';
   for (var i = 0; i < all.length; i++) tags += '<span class="tag">'+all[i]+'</span>';
-  var html = '<div class="entry-header"><div><div class="entry-meta">'+fmtFecha(fecha)+' &middot; '+(curso||'&mdash;')+'</div><strong style="font-family:'Playfair Display',serif;font-size:1rem">'+(docente||'Sin nombre')+'</strong>'+(mood?'<span style="margin-left:8px;font-size:1.1rem">'+mood+'</span>':'')+'</div><button class="btn-delete">&#x2715;</button></div>';
+  var html = '<div class="entry-header"><div><div class="entry-meta">'+fmtFecha(fecha)+' · '+(curso||'—')+'</div><strong style="font-family:'Playfair Display',serif;font-size:1rem">'+(docente||'Sin nombre')+'</strong>'+(mood?'<span style="margin-left:8px;font-size:1.1rem">'+mood+'</span>':'')+'</div><button class="btn-delete">&#x2715;</button></div>';
   if (all.length) html += '<div class="entry-tags">'+tags+'</div>';
-  if (comportamiento) html += '<p class="entry-body" style="margin-top:10px"><strong style="font-size:11px;opacity:.6;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase">GRUPO &middot; </strong>'+comportamiento+'</p>';
+  if (comportamiento) html += '<p class="entry-body" style="margin-top:10px"><strong style="font-size:11px;opacity:.6;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase">GRUPO · </strong>'+comportamiento+'</p>';
   if (reflexion) html += '<p class="entry-body" style="font-style:italic;border-left:3px solid var(--rust);padding-left:12px;margin-top:10px">'+reflexion+'</p>';
   var item = document.createElement('div');
   item.className = 'entry-item';
@@ -1607,10 +1607,10 @@ function guardarDiario() {
   clearEmpty(lista);
   var moods = ['','😞','😐','🙂','😊','🤩'];
   var mood = estado ? moods[estado] : '';
-  var html = '<div class="entry-header"><div class="entry-meta">'+fmtFecha(fecha)+(mood?' &middot; '+mood:'')+'</div><button class="btn-delete">&#x2715;</button></div>';
-  if (sentir) html += '<p class="entry-body" style="margin-bottom:8px"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;display:block;margin-bottom:3px">Sent&iacute; &rarr;</span>'+sentir+'</p>';
-  if (bien) html += '<p class="entry-body" style="margin-bottom:8px"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;color:var(--sage);display:block;margin-bottom:3px">Sali&oacute; bien &rarr;</span>'+bien+'</p>';
-  if (mejorar) html += '<p class="entry-body"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;color:var(--gold);display:block;margin-bottom:3px">Mejorar&iacute;a &rarr;</span>'+mejorar+'</p>';
+  var html = '<div class="entry-header"><div class="entry-meta">'+fmtFecha(fecha)+(mood?' · '+mood:'')+'</div><button class="btn-delete">&#x2715;</button></div>';
+  if (sentir) html += '<p class="entry-body" style="margin-bottom:8px"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;display:block;margin-bottom:3px">Sentí →</span>'+sentir+'</p>';
+  if (bien) html += '<p class="entry-body" style="margin-bottom:8px"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;color:var(--sage);display:block;margin-bottom:3px">Salió bien →</span>'+bien+'</p>';
+  if (mejorar) html += '<p class="entry-body"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;color:var(--gold);display:block;margin-bottom:3px">Mejoraría →</span>'+mejorar+'</p>';
   var item = document.createElement('div');
   item.className = 'entry-item';
   item.style.borderLeft = '3px solid var(--gold)';
@@ -1641,10 +1641,10 @@ function guardarPlan() {
   if (!materia && !tema) { alert('Completá al menos la materia o el tema.'); return; }
   var lista = document.getElementById('plan-lista');
   clearEmpty(lista);
-  var html = '<div class="entry-header"><div><div class="entry-meta">'+fmtFecha(fecha)+' &middot; '+(curso||'&mdash;')+'</div><strong style="font-family:'Playfair Display',serif;font-size:1.05rem">'+(materia||'&mdash;')+' &mdash; '+(tema||'Sin tema')+'</strong></div><button class="btn-delete">&#x2715;</button></div><div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">';
-  if (inicio) html += '<div style="border-left:3px solid var(--sage);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--sage);display:block;margin-bottom:3px">Inicio'+(tInicio?' &middot; '+tInicio+' min':'')+'</span><span class="entry-body">'+inicio+'</span></div>';
-  if (dev) html += '<div style="border-left:3px solid var(--gold);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:3px">Desarrollo'+(tDev?' &middot; '+tDev+' min':'')+'</span><span class="entry-body">'+dev+'</span></div>';
-  if (cierre) html += '<div style="border-left:3px solid var(--rust);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);display:block;margin-bottom:3px">Cierre'+(tCierre?' &middot; '+tCierre+' min':'')+'</span><span class="entry-body">'+cierre+'</span></div>';
+  var html = '<div class="entry-header"><div><div class="entry-meta">'+fmtFecha(fecha)+' · '+(curso||'—')+'</div><strong style="font-family:'Playfair Display',serif;font-size:1.05rem">'+(materia||'—')+' — '+(tema||'Sin tema')+'</strong></div><button class="btn-delete">&#x2715;</button></div><div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">';
+  if (inicio) html += '<div style="border-left:3px solid var(--sage);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--sage);display:block;margin-bottom:3px">Inicio'+(tInicio?' · '+tInicio+' min':'')+'</span><span class="entry-body">'+inicio+'</span></div>';
+  if (dev) html += '<div style="border-left:3px solid var(--gold);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:3px">Desarrollo'+(tDev?' · '+tDev+' min':'')+'</span><span class="entry-body">'+dev+'</span></div>';
+  if (cierre) html += '<div style="border-left:3px solid var(--rust);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);display:block;margin-bottom:3px">Cierre'+(tCierre?' · '+tCierre+' min':'')+'</span><span class="entry-body">'+cierre+'</span></div>';
   if (materiales) html += '<div style="margin-top:4px"><span style="font-size:10px;font-family:'DM Mono',monospace;opacity:.5;letter-spacing:.1em;text-transform:uppercase">Materiales: </span><span class="entry-body">'+materiales+'</span></div>';
   html += '</div>';
   var item = document.createElement('div');
@@ -1677,7 +1677,7 @@ function guardarEstudiante() {
   clearEmpty(lista);
   var stars = '';
   for (var s = 0; s < Number(participacion); s++) stars += '⭐';
-  var html = '<div class="entry-header"><strong style="font-family:'Playfair Display',serif;font-size:1.1rem">'+nombre+'</strong><button class="btn-delete">&#x2715;</button></div><div class="entry-meta" style="margin-top:4px">'+(curso||'&mdash;')+(stars?' &middot; Participaci&oacute;n: '+stars:'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">';
+  var html = '<div class="entry-header"><strong style="font-family:'Playfair Display',serif;font-size:1.1rem">'+nombre+'</strong><button class="btn-delete">&#x2715;</button></div><div class="entry-meta" style="margin-top:4px">'+(curso||'—')+(stars?' · Participación: '+stars:'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">';
   if (fortalezas) html += '<div><div class="mini-label">Fortalezas</div><div class="mini-text" style="color:var(--sage)">'+fortalezas+'</div></div>';
   if (dificultades) html += '<div><div class="mini-label">Dificultades</div><div class="mini-text" style="color:var(--rust)">'+dificultades+'</div></div>';
   html += '</div>';
@@ -1713,7 +1713,7 @@ function guardarAprendizaje() {
   var item = document.createElement('div');
   item.className = 'aprendizaje-item';
   item.style.borderLeft = '3px solid '+color;
-  item.innerHTML = '<div class="ap-icon">'+emoji+'</div><div class="ap-body"><div class="ap-type" style="color:'+color+'">'+label+' &middot; '+fmtFecha(fecha)+'</div><div class="ap-text">'+texto+'</div></div><button class="btn-delete">&#x2715;</button>';
+  item.innerHTML = '<div class="ap-icon">'+emoji+'</div><div class="ap-body"><div class="ap-type" style="color:'+color+'">'+label+' · '+fmtFecha(fecha)+'</div><div class="ap-text">'+texto+'</div></div><button class="btn-delete">&#x2715;</button>';
   item.querySelector('.btn-delete').onclick = function() { item.parentNode.removeChild(item); persistirListas(); };
   lista.insertBefore(item, lista.firstChild);
   document.getElementById('ap-texto').value = '';
