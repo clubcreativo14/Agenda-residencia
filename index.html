@@ -3,1587 +3,657 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agenda de Residencia Docente</title>
+<title>Agenda de Residencia</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --cream: #F5F0E8;
-    --warm-white: #FEFCF7;
-    --ink: #1A1614;
-    --ink-light: #3D3330;
-    --rust: #C45C3A;
-    --rust-light: #E8856B;
-    --sage: #5C7A5F;
-    --sage-light: #8FAF91;
-    --gold: #C9943A;
-    --gold-light: #E8BE72;
-    --lavender: #7B6FAA;
-    --lavender-light: #A99FCC;
-    --blush: #D4836A;
-    --border: rgba(26,22,20,0.12);
-    --shadow: rgba(26,22,20,0.08);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── NOISE TEXTURE OVERLAY ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.4;
-  }
-
-  /* ── HEADER ── */
-  header {
-    background: var(--ink);
-    color: var(--cream);
-    padding: 48px 40px 40px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  header::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0; right: 0;
-    height: 32px;
-    background: var(--cream);
-    clip-path: ellipse(55% 100% at 50% 100%);
-  }
-
-  .header-accent {
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 220px; height: 220px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--rust) 0%, transparent 70%);
-    opacity: 0.25;
-  }
-
-  .header-accent-2 {
-    position: absolute;
-    bottom: 10px; left: -40px;
-    width: 160px; height: 160px;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
-    opacity: 0.18;
-  }
-
-  .header-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--rust-light);
-    margin-bottom: 12px;
-    opacity: 0.9;
-  }
-
-  header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    position: relative;
-    z-index: 1;
-  }
-
-  header h1 em {
-    font-style: italic;
-    color: var(--rust-light);
-  }
-
-  .header-sub {
-    margin-top: 12px;
-    font-size: 14px;
-    font-weight: 300;
-    opacity: 0.65;
-    letter-spacing: 0.04em;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ── NAV TABS ── */
-  .nav-wrapper {
-    background: var(--warm-white);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px var(--shadow);
-  }
-  .nav-wrapper::-webkit-scrollbar { display: none; }
-
-  nav {
-    display: flex;
-    gap: 0;
-    min-width: max-content;
-  }
-
-  .tab-btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-light);
-    background: none;
-    border: none;
-    padding: 16px 20px;
-    cursor: pointer;
-    position: relative;
-    white-space: nowrap;
-    transition: color 0.2s;
-    letter-spacing: 0.01em;
-  }
-
-  .tab-btn::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 20%; right: 20%;
-    height: 2.5px;
-    background: var(--rust);
-    border-radius: 2px 2px 0 0;
-    transform: scaleX(0);
-    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
-  }
-
-  .tab-btn.active { color: var(--rust); }
-  .tab-btn.active::after { transform: scaleX(1); }
-  .tab-btn:hover { color: var(--ink); }
-
-  /* ── MAIN ── */
-  main {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 40px 24px 80px;
-  }
-
-  .section { display: none; animation: fadeUp 0.35s ease both; }
-  .section.active { display: block; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── SECTION HEADER ── */
-  .section-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-
-  .section-icon {
-    width: 48px; height: 48px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    flex-shrink: 0;
-  }
-
-  .section-title h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-  }
-
-  .section-title p {
-    font-size: 13px;
-    color: var(--ink-light);
-    opacity: 0.65;
-    margin-top: 4px;
-    font-weight: 300;
-  }
-
-  /* ── CARDS ── */
-  .card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 28px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 12px var(--shadow);
-    transition: box-shadow 0.2s, transform 0.2s;
-  }
-
-  .card:hover {
-    box-shadow: 0 6px 24px rgba(26,22,20,0.12);
-    transform: translateY(-1px);
-  }
-
-  .card-title {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .card-title-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ── FORM ELEMENTS ── */
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-  .form-grid.cols-1 { grid-template-columns: 1fr; }
-
-  @media (max-width: 600px) {
-    .form-grid, .form-grid.cols-3 { grid-template-columns: 1fr; }
-  }
-
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field.full { grid-column: 1 / -1; }
-
-  label {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    opacity: 0.7;
-  }
-
-  input[type="text"],
-  input[type="date"],
-  select,
-  textarea {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--ink);
-    background: var(--cream);
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    width: 100%;
-    resize: vertical;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--rust);
-    box-shadow: 0 0 0 3px rgba(196,92,58,0.1);
-  }
-
-  textarea { min-height: 80px; }
-  textarea.tall { min-height: 110px; }
-
-  select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%233D3330' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    padding-right: 32px;
-  }
-
-  /* ── STARS RATING ── */
-  .stars-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-
-  .star-btn {
-    font-size: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.15s;
-    line-height: 1;
-    opacity: 0.3;
-  }
-  .star-btn.active { opacity: 1; }
-  .star-btn:hover { transform: scale(1.2); }
-
-  /* ── PILL TAGS ── */
-  .pills-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-
-  .pill {
-    font-size: 12px;
-    font-weight: 500;
-    padding: 5px 13px;
-    border-radius: 100px;
-    border: 1.5px solid var(--border);
-    background: var(--cream);
-    cursor: pointer;
-    transition: all 0.18s;
-    color: var(--ink-light);
-    user-select: none;
-  }
-
-  .pill:hover { border-color: var(--rust); color: var(--rust); }
-  .pill.selected { background: var(--rust); border-color: var(--rust); color: white; }
-
-  /* ── ADD BUTTON ── */
-  .btn-add {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    color: white;
-    background: var(--rust);
-    border: none;
-    border-radius: 12px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 3px 10px rgba(196,92,58,0.3);
-    letter-spacing: 0.02em;
-  }
-
-  .btn-add:hover { background: var(--blush); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(196,92,58,0.35); }
-  .btn-add:active { transform: translateY(0); }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--rust);
-    border: 1.5px solid var(--rust);
-    box-shadow: none;
-  }
-
-  .btn-secondary:hover { background: rgba(196,92,58,0.06); box-shadow: none; }
-
-  .btn-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-    flex-wrap: wrap;
-  }
-
-  /* ── ENTRIES LIST ── */
-  .entries-list { margin-top: 28px; }
-
-  .entry-item {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 20px;
-    margin-bottom: 12px;
-    position: relative;
-    transition: box-shadow 0.2s;
-  }
-
-  .entry-item:hover { box-shadow: 0 4px 16px var(--shadow); }
-
-  .entry-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .entry-meta {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-light);
-    opacity: 0.6;
-    margin-bottom: 8px;
-  }
-
-  .entry-body {
-    font-size: 14px;
-    line-height: 1.55;
-    color: var(--ink);
-  }
-
-  .entry-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-
-  .tag {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 100px;
-    background: var(--cream);
-    color: var(--ink-light);
-    border: 1px solid var(--border);
-  }
-
-  .btn-delete {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--ink-light);
-    opacity: 0.35;
-    font-size: 15px;
-    padding: 2px 4px;
-    border-radius: 6px;
-    transition: opacity 0.2s, color 0.2s;
-    flex-shrink: 0;
-  }
-  .btn-delete:hover { opacity: 1; color: var(--rust); }
-
-  /* ── DIARY PROMPTS ── */
-  .prompt-card {
-    background: linear-gradient(135deg, var(--ink) 0%, #2D2420 100%);
-    color: var(--cream);
-    border-radius: 18px;
-    padding: 28px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .prompt-card::before {
-    content: '"';
-    position: absolute;
-    top: -10px; left: 20px;
-    font-family: 'Playfair Display', serif;
-    font-size: 120px;
-    color: white;
-    opacity: 0.06;
-    line-height: 1;
-  }
-
-  .prompt-q {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.15rem;
-    font-style: italic;
-    margin-bottom: 14px;
-    color: var(--gold-light);
-    position: relative;
-    z-index: 1;
-  }
-
-  .prompt-card textarea {
-    background: rgba(255,255,255,0.06);
-    border-color: rgba(255,255,255,0.15);
-    color: var(--cream);
-  }
-  .prompt-card textarea:focus {
-    border-color: var(--gold-light);
-    box-shadow: 0 0 0 3px rgba(201,148,58,0.15);
-  }
-  .prompt-card textarea::placeholder { color: rgba(245,240,232,0.35); }
-
-  /* ── PLANNING TABLE ── */
-  .plan-stage {
-    border-left: 3px solid var(--border);
-    padding-left: 20px;
-    margin-bottom: 24px;
-    position: relative;
-  }
-
-  .plan-stage::before {
-    content: '';
-    position: absolute;
-    left: -8px; top: 4px;
-    width: 13px; height: 13px;
-    border-radius: 50%;
-    background: var(--warm-white);
-    border: 2.5px solid var(--border);
-  }
-
-  .plan-stage.inicio { border-color: var(--sage); }
-  .plan-stage.inicio::before { border-color: var(--sage); background: var(--sage-light); }
-
-  .plan-stage.desarrollo { border-color: var(--gold); }
-  .plan-stage.desarrollo::before { border-color: var(--gold); background: var(--gold-light); }
-
-  .plan-stage.cierre { border-color: var(--rust); }
-  .plan-stage.cierre::before { border-color: var(--rust); background: var(--rust-light); }
-
-  .plan-stage-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .time-chip {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--ink-light);
-    opacity: 0.8;
-  }
-
-  /* ── STUDENT CARD ── */
-  .student-card {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px 22px;
-    margin-bottom: 16px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-
-  .student-name-bar {
-    grid-column: 1/-1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 4px;
-  }
-
-  .student-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-  }
-
-  .participation-bar {
-    display: flex;
-    gap: 4px;
-    align-items: center;
-  }
-
-  .part-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    border: 1.5px solid var(--border);
-    background: var(--cream);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .part-dot.filled { background: var(--sage); border-color: var(--sage); }
-
-  .mini-label {
-    font-size: 10px;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    opacity: 0.55;
-    margin-bottom: 5px;
-  }
-
-  .mini-text {
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--ink);
-  }
-
-  /* ── IDEAS / INSPIRACIÓN ── */
-  .ideas-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
-
-  @media (max-width: 560px) { .ideas-grid { grid-template-columns: 1fr; } }
-
-  .idea-card {
-    border-radius: 16px;
-    padding: 22px;
-    position: relative;
-    overflow: hidden;
-    min-height: 160px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .idea-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .idea-card textarea {
-    flex: 1;
-    min-height: 80px;
-    background: rgba(255,255,255,0.4);
-    border-color: rgba(0,0,0,0.1);
-    font-size: 13px;
-  }
-
-  .ic-sage { background: linear-gradient(135deg, #E8F2E9 0%, #D4EAD6 100%); }
-  .ic-gold { background: linear-gradient(135deg, #FBF2E1 0%, #F5E8C8 100%); }
-  .ic-lavender { background: linear-gradient(135deg, #EEE9F8 0%, #E2D9F3 100%); }
-  .ic-rust { background: linear-gradient(135deg, #FAE8E2 0%, #F2D4C8 100%); }
-
-  .frases-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-
-  .frase-item {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .frase-quote {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: var(--rust);
-    line-height: 1;
-    flex-shrink: 0;
-    margin-top: -4px;
-    opacity: 0.6;
-  }
-
-  .frase-text { font-size: 14px; line-height: 1.5; font-style: italic; color: var(--ink); flex: 1; }
-
-  /* ── EMPTY STATE ── */
-  .empty-state {
-    text-align: center;
-    padding: 48px 20px;
-    color: var(--ink-light);
-    opacity: 0.45;
-  }
-
-  .empty-state .emoji { font-size: 40px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; }
-
-  /* ── COLOR DOTS ── */
-  .color-rust { color: var(--rust); }
-  .color-sage { color: var(--sage); }
-  .color-gold { color: var(--gold); }
-  .color-lavender { color: var(--lavender); }
-
-  .bg-rust-soft { background: #FAE8E2; }
-  .bg-sage-soft { background: #E8F2E9; }
-  .bg-gold-soft { background: #FBF2E1; }
-  .bg-lavender-soft { background: #EEE9F8; }
-
-  /* ── CHECKLIST ── */
-  .checklist { display: flex; flex-direction: column; gap: 8px; }
-
-  .check-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    background: var(--cream);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-
-  .check-item:hover { background: #F0E8DC; }
-  .check-item.done { opacity: 0.5; text-decoration: line-through; }
-
-  .check-box {
-    width: 18px; height: 18px;
-    border-radius: 5px;
-    border: 2px solid var(--border);
-    flex-shrink: 0;
-    margin-top: 1px;
-    display: flex; align-items: center; justify-content: center;
-    background: white;
-    transition: all 0.15s;
-    font-size: 11px;
-  }
-
-  .check-item.done .check-box {
-    background: var(--sage);
-    border-color: var(--sage);
-    color: white;
-  }
-
-  .check-text { font-size: 14px; line-height: 1.45; flex: 1; }
-
-  /* ── DIVIDER ── */
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 24px 0;
-  }
-
-  /* ── APRENDIZAJES ── */
-  .aprendizaje-item {
-    background: var(--warm-white);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin-bottom: 10px;
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    position: relative;
-    transition: box-shadow 0.2s;
-  }
-  .aprendizaje-item:hover { box-shadow: 0 3px 12px var(--shadow); }
-
-  .ap-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-  .ap-body { flex: 1; }
-  .ap-type {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-  }
-  .ap-text { font-size: 14px; line-height: 1.5; }
-
-  /* ── FOOTER ── */
-  .footer-note {
-    text-align: center;
-    font-size: 12px;
-    color: var(--ink-light);
-    opacity: 0.35;
-    margin-top: 60px;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: 0.08em;
-  }
-
-  
+:root {
+  --cream: #F5F0E8;
+  --warm: #FEFCF7;
+  --ink: #1A1614;
+  --ink2: #3D3330;
+  --rust: #C45C3A;
+  --rust2: #E8856B;
+  --sage: #5C7A5F;
+  --sage2: #8FAF91;
+  --gold: #C9943A;
+  --gold2: #E8BE72;
+  --lav: #7B6FAA;
+  --lav2: #A99FCC;
+  --blush: #D4836A;
+  --brd: rgba(26,22,20,0.12);
+  --sh: rgba(26,22,20,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+
+/* HEADER */
+header{background:var(--ink);color:var(--cream);padding:48px 40px 40px;position:relative;overflow:hidden;}
+header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:32px;background:var(--cream);clip-path:ellipse(55% 100% at 50% 100%);}
+.ha{position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--rust) 0%,transparent 70%);opacity:.25;}
+.ha2{position:absolute;bottom:10px;left:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,var(--gold) 0%,transparent 70%);opacity:.18;}
+.hlabel{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--rust2);margin-bottom:12px;}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.1;letter-spacing:-.02em;position:relative;z-index:1;}
+header h1 em{font-style:italic;color:var(--rust2);}
+.hsub{margin-top:12px;font-size:14px;font-weight:300;opacity:.65;letter-spacing:.04em;position:relative;z-index:1;}
+
+/* NAV */
+.nav-wrap{background:var(--warm);border-bottom:1px solid var(--brd);padding:0 24px;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px var(--sh);}
+.nav-wrap::-webkit-scrollbar{display:none;}
+nav{display:flex;min-width:max-content;}
+.tab{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink2);background:none;border:none;padding:16px 20px;cursor:pointer;position:relative;white-space:nowrap;transition:color .2s;letter-spacing:.01em;-webkit-appearance:none;}
+.tab::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2.5px;background:var(--rust);border-radius:2px 2px 0 0;transform:scaleX(0);transition:transform .25s;}
+.tab.on{color:var(--rust);}
+.tab.on::after{transform:scaleX(1);}
+
+/* MAIN */
+main{max-width:860px;margin:0 auto;padding:40px 24px 80px;}
+.sec{display:none;}
+.sec.on{display:block;}
+
+/* SECTION HEADER */
+.sec-hd{display:flex;align-items:flex-start;gap:16px;margin-bottom:32px;}
+.sec-ico{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.sec-ttl h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1.1;letter-spacing:-.02em;}
+.sec-ttl p{font-size:13px;color:var(--ink2);opacity:.65;margin-top:4px;font-weight:300;}
+
+/* CARDS */
+.card{background:var(--warm);border:1px solid var(--brd);border-radius:18px;padding:28px;margin-bottom:20px;box-shadow:0 2px 12px var(--sh);}
+.ctitle{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.cdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.fg3{grid-template-columns:1fr 1fr 1fr;}
+.fg1{grid-template-columns:1fr;}
+@media(max-width:600px){.fg,.fg3{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);opacity:.7;}
+input[type=text],input[type=date],select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--cream);border:1.5px solid var(--brd);border-radius:10px;padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%;resize:vertical;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--rust);box-shadow:0 0 0 3px rgba(196,92,58,.1);}
+textarea{min-height:80px;}
+textarea.tall{min-height:110px;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%233D3330' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+
+/* STARS */
+.star-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.star{font-size:20px;background:none;border:none;cursor:pointer;transition:transform .15s;line-height:1;opacity:.3;-webkit-appearance:none;}
+.star.on{opacity:1;}
+
+/* PILLS */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.pill{font-size:12px;font-weight:500;padding:5px 13px;border-radius:100px;border:1.5px solid var(--brd);background:var(--cream);cursor:pointer;transition:all .18s;color:var(--ink2);user-select:none;}
+.pill.on{background:var(--rust);border-color:var(--rust);color:white;}
+
+/* BUTTONS */
+.btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:white;background:var(--rust);border:none;border-radius:12px;padding:12px 24px;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:8px;box-shadow:0 3px 10px rgba(196,92,58,.3);letter-spacing:.02em;-webkit-appearance:none;}
+.btn2{background:transparent;color:var(--rust);border:1.5px solid var(--rust);box-shadow:none;}
+.btn-row{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;}
+.bdel{background:none;border:none;cursor:pointer;color:var(--ink2);opacity:.35;font-size:15px;padding:2px 4px;border-radius:6px;-webkit-appearance:none;}
+
+/* ENTRIES */
+.elist{margin-top:28px;}
+.eitem{background:var(--warm);border:1px solid var(--brd);border-radius:14px;padding:18px 20px;margin-bottom:12px;}
+.ehd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.emeta{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink2);opacity:.6;margin-bottom:8px;}
+.ebody{font-size:14px;line-height:1.55;color:var(--ink);}
+.etags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.tag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:100px;background:var(--cream);color:var(--ink2);border:1px solid var(--brd);}
+
+/* DIARY */
+.dcard{border-radius:18px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden;}
+.dcard::before{content:'"';position:absolute;top:-10px;left:20px;font-family:'Playfair Display',serif;font-size:120px;color:white;opacity:.06;line-height:1;}
+.dq{font-family:'Playfair Display',serif;font-size:1.15rem;font-style:italic;margin-bottom:14px;position:relative;z-index:1;}
+.dcard textarea{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.15);color:var(--cream);}
+.dcard textarea::placeholder{color:rgba(245,240,232,.35);}
+
+/* PLAN */
+.pstage{border-left:3px solid var(--brd);padding-left:20px;margin-bottom:24px;position:relative;}
+.pstage::before{content:'';position:absolute;left:-8px;top:4px;width:13px;height:13px;border-radius:50%;background:var(--warm);border:2.5px solid var(--brd);}
+.ps-ini{border-color:var(--sage);}
+.ps-ini::before{border-color:var(--sage);background:var(--sage2);}
+.ps-dev{border-color:var(--gold);}
+.ps-dev::before{border-color:var(--gold);background:var(--gold2);}
+.ps-cie{border-color:var(--rust);}
+.ps-cie::before{border-color:var(--rust);background:var(--rust2);}
+.plabel{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.tmin{background:var(--cream);border:1px solid var(--brd);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--ink2);width:60px;}
+
+/* STUDENTS */
+.mlabel{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);opacity:.55;margin-bottom:5px;}
+.mtext{font-size:13px;line-height:1.5;color:var(--ink);}
+
+/* IDEAS */
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+@media(max-width:560px){.igrid{grid-template-columns:1fr;}}
+.icard{border-radius:16px;padding:22px;min-height:160px;display:flex;flex-direction:column;}
+.icard h3{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.icard textarea{flex:1;min-height:80px;background:rgba(255,255,255,.4);border-color:rgba(0,0,0,.1);font-size:13px;}
+.ic1{background:linear-gradient(135deg,#E8F2E9,#D4EAD6);}
+.ic2{background:linear-gradient(135deg,#FBF2E1,#F5E8C8);}
+.ic3{background:linear-gradient(135deg,#EEE9F8,#E2D9F3);}
+.ic4{background:linear-gradient(135deg,#FAE8E2,#F2D4C8);}
+
+/* FRASES */
+.flist{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.fitem{background:var(--warm);border:1px solid var(--brd);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px;}
+.fq{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--rust);line-height:1;flex-shrink:0;margin-top:-4px;opacity:.6;}
+.ftxt{font-size:14px;line-height:1.5;font-style:italic;color:var(--ink);flex:1;}
+
+/* CHECKLIST */
+.chklist{display:flex;flex-direction:column;gap:8px;}
+.chk{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--cream);border:1px solid var(--brd);cursor:pointer;}
+.chk.done{opacity:.5;text-decoration:line-through;}
+.chkbox{width:18px;height:18px;border-radius:5px;border:2px solid var(--brd);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:white;font-size:11px;}
+.chk.done .chkbox{background:var(--sage);border-color:var(--sage);color:white;}
+.chktxt{font-size:14px;line-height:1.45;flex:1;}
+
+/* APRENDIZAJES */
+.aitem{background:var(--warm);border:1px solid var(--brd);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;}
+.aico{font-size:20px;flex-shrink:0;margin-top:1px;}
+.abody{flex:1;}
+.atype{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;}
+.atxt{font-size:14px;line-height:1.5;}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--ink2);opacity:.45;}
+.empty .emo{font-size:40px;margin-bottom:12px;}
+
+/* DIVIDER */
+hr{border:none;border-top:1px solid var(--brd);margin:24px 0;}
+
+/* COLORS */
+.cr{color:var(--rust);}
+.cs{color:var(--sage);}
+.cg{color:var(--gold);}
+.cl{color:var(--lav);}
+.bgrs{background:#FAE8E2;}
+.bggs{background:#E8F2E9;}
+.bgys{background:#FBF2E1;}
+.bgls{background:#EEE9F8;}
+
+/* FOOTER */
+.foot{text-align:center;font-size:12px;color:var(--ink2);opacity:.35;margin-top:60px;font-family:'DM Mono',monospace;letter-spacing:.08em;}
 </style>
 </head>
 <body>
 
-
-
 <header>
-  <div class="header-accent"></div>
-  <div class="header-accent-2"></div>
-  <div class="header-label">✦ Profesorado · Práctica Docente</div>
+  <div class="ha"></div>
+  <div class="ha2"></div>
+  <div class="hlabel">✦ Profesorado · Práctica Docente</div>
   <h1>Mi Agenda de<br><em>Residencia</em></h1>
-  <p class="header-sub">Un espacio para registrar, reflexionar y crecer</p>
+  <p class="hsub">Un espacio para registrar, reflexionar y crecer</p>
 </header>
 
-<div class="nav-wrapper">
+<div class="nav-wrap">
   <nav>
-    <button class="tab-btn active" onclick="showTab('observaciones',this)">🔍 Observaciones</button>
-    <button class="tab-btn" onclick="showTab('diario',this)">📖 Diario</button>
-    <button class="tab-btn" onclick="showTab('planificacion',this)">📋 Planificación</button>
-    <button class="tab-btn" onclick="showTab('estudiantes',this)">👥 Estudiantes</button>
-    <button class="tab-btn" onclick="showTab('inspiracion',this)">✨ Inspiración</button>
-    <button class="tab-btn" onclick="showTab('aprendizajes',this)">🌱 Aprendizajes</button>
+    <button class="tab on" id="t-obs">🔍 Observaciones</button>
+    <button class="tab" id="t-dia">📖 Diario</button>
+    <button class="tab" id="t-pla">📋 Planificación</button>
+    <button class="tab" id="t-est">👥 Estudiantes</button>
+    <button class="tab" id="t-ins">✨ Inspiración</button>
+    <button class="tab" id="t-apr">🌱 Aprendizajes</button>
   </nav>
 </div>
 
 <main>
 
-  <!-- ────────── OBSERVACIONES ────────── -->
-  <div class="section active" id="observaciones">
-    <div class="section-header">
-      <div class="section-icon bg-rust-soft">🔍</div>
-      <div class="section-title">
-        <h2>Observaciones Áulicas</h2>
-        <p>Registrá cada clase que observás con detalle</p>
+<!-- OBSERVACIONES -->
+<div class="sec on" id="s-obs">
+  <div class="sec-hd">
+    <div class="sec-ico bgrs">🔍</div>
+    <div class="sec-ttl"><h2>Observaciones Áulicas</h2><p>Registrá cada clase que observás</p></div>
+  </div>
+  <div class="card">
+    <div class="ctitle cr"><div class="cdot" style="background:var(--rust)"></div>Nueva observación</div>
+    <div class="fg">
+      <div class="field"><label>Fecha</label><input type="date" id="obs-fecha"></div>
+      <div class="field"><label>Curso</label><input type="text" id="obs-curso" placeholder="Ej: 3° B"></div>
+      <div class="field full"><label>Docente</label><input type="text" id="obs-docente" placeholder="Nombre del/la docente"></div>
+      <div class="field full">
+        <label>Estrategias</label>
+        <div class="pills" id="obs-pills">
+          <span class="pill">Exposición</span>
+          <span class="pill">Trabajo grupal</span>
+          <span class="pill">Pregunta-respuesta</span>
+          <span class="pill">TIC</span>
+          <span class="pill">Debate</span>
+          <span class="pill">Juego</span>
+          <span class="pill">Mapa conceptual</span>
+          <span class="pill">Resolución de problemas</span>
+        </div>
+        <input type="text" id="obs-est-otro" placeholder="Otras estrategias..." style="margin-top:8px">
       </div>
+      <div class="field full">
+        <label>Clima del grupo</label>
+        <div class="star-row" id="obs-clima">
+          <button class="star" data-n="1">😞</button>
+          <button class="star" data-n="2">😐</button>
+          <button class="star" data-n="3">🙂</button>
+          <button class="star" data-n="4">😊</button>
+          <button class="star" data-n="5">🤩</button>
+        </div>
+      </div>
+      <div class="field full"><label>Comportamiento del grupo</label><textarea id="obs-comp" class="tall" placeholder="Describí cómo respondió el grupo..."></textarea></div>
+      <div class="field full"><label>Reflexión personal</label><textarea id="obs-ref" class="tall" placeholder="¿Qué te llamó la atención? ¿Qué tomarías para tu práctica?"></textarea></div>
     </div>
-
-    <div class="card">
-      <div class="card-title color-rust">
-        <div class="card-title-dot" style="background:var(--rust)"></div>
-        Nueva observación
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Fecha</label>
-          <input type="date" id="obs-fecha">
-        </div>
-        <div class="field">
-          <label>Curso / Año</label>
-          <input type="text" id="obs-curso" placeholder="Ej: 3° B — Secundaria">
-        </div>
-        <div class="field full">
-          <label>Docente observado/a</label>
-          <input type="text" id="obs-docente" placeholder="Nombre del/la docente">
-        </div>
-        <div class="field full">
-          <label>Estrategias utilizadas</label>
-          <div class="pills-row" id="estrategias-pills">
-            <span class="pill" onclick="togglePill(this)">Exposición</span>
-            <span class="pill" onclick="togglePill(this)">Trabajo grupal</span>
-            <span class="pill" onclick="togglePill(this)">Pregunta-respuesta</span>
-            <span class="pill" onclick="togglePill(this)">TIC</span>
-            <span class="pill" onclick="togglePill(this)">Debate</span>
-            <span class="pill" onclick="togglePill(this)">Juego</span>
-            <span class="pill" onclick="togglePill(this)">Mapa conceptual</span>
-            <span class="pill" onclick="togglePill(this)">Resolución de problemas</span>
-          </div>
-          <input type="text" id="obs-estrategias-custom" placeholder="Otras estrategias..." style="margin-top:8px">
-        </div>
-        <div class="field full">
-          <label>Comportamiento del grupo</label>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-            <span style="font-size:12px;opacity:0.6">Clima:</span>
-            <div class="stars-row" id="clima-stars">
-              <button class="star-btn" onclick="setStars('clima-stars',1)">😞</button>
-              <button class="star-btn" onclick="setStars('clima-stars',2)">😐</button>
-              <button class="star-btn" onclick="setStars('clima-stars',3)">🙂</button>
-              <button class="star-btn" onclick="setStars('clima-stars',4)">😊</button>
-              <button class="star-btn" onclick="setStars('clima-stars',5)">🤩</button>
-            </div>
-          </div>
-          <textarea id="obs-comportamiento" placeholder="Describí cómo respondió el grupo, la dinámica, la atención..." class="tall"></textarea>
-        </div>
-        <div class="field full">
-          <label>Reflexión personal</label>
-          <textarea id="obs-reflexion" placeholder="¿Qué te llamó la atención? ¿Qué tomarías para tu práctica? ¿Qué harías diferente?" class="tall"></textarea>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-add" onclick="guardarObservacion()">+ Guardar observación</button>
-        <button class="btn-add btn-secondary" onclick="limpiarObservacion()">Limpiar</button>
-      </div>
-    </div>
-
-    <div class="entries-list" id="obs-lista">
-      <div class="empty-state">
-        <div class="emoji">📝</div>
-        <p>Tus observaciones aparecerán acá</p>
-      </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-obs">+ Guardar observación</button>
+      <button class="btn btn2" id="btn-obs-lim">Limpiar</button>
     </div>
   </div>
+  <div class="elist" id="obs-list"><div class="empty"><div class="emo">📝</div><p>Tus observaciones aparecerán acá</p></div></div>
+</div>
 
-  <!-- ────────── DIARIO ────────── -->
-  <div class="section" id="diario">
-    <div class="section-header">
-      <div class="section-icon bg-gold-soft">📖</div>
-      <div class="section-title">
-        <h2>Diario de Residencia</h2>
-        <p>Tu espacio de reflexión honesta — nadie más lo lee</p>
-      </div>
+<!-- DIARIO -->
+<div class="sec" id="s-dia">
+  <div class="sec-hd">
+    <div class="sec-ico bgys">📖</div>
+    <div class="sec-ttl"><h2>Diario de Residencia</h2><p>Tu espacio de reflexión honesta</p></div>
+  </div>
+  <div class="dcard" style="background:linear-gradient(135deg,#1A1614,#2D2420)">
+    <div class="dq" style="color:var(--gold2)">¿Qué sentí hoy?</div>
+    <textarea id="dia-sentir" placeholder="Escribí libremente: emociones, tensiones, satisfacciones..."></textarea>
+  </div>
+  <div class="dcard" style="background:linear-gradient(135deg,#2A3D2C,#1E2E20)">
+    <div class="dq" style="color:var(--sage2)">¿Qué salió bien?</div>
+    <textarea id="dia-bien" placeholder="Nombrá los logros, por pequeños que sean..."></textarea>
+  </div>
+  <div class="dcard" style="background:linear-gradient(135deg,#3A2E1A,#2A2010)">
+    <div class="dq" style="color:var(--gold2)">¿Qué mejoraría?</div>
+    <textarea id="dia-mej" placeholder="¿Qué cambiarías? ¿Qué preguntas te quedaron?"></textarea>
+  </div>
+  <div class="card">
+    <div class="fg">
+      <div class="field"><label>Fecha</label><input type="date" id="dia-fecha"></div>
+      <div class="field"><label>¿Cómo me sentí?</label><div class="star-row" id="dia-stars" style="margin-top:6px"><button class="star" data-n="1">😞</button><button class="star" data-n="2">😐</button><button class="star" data-n="3">🙂</button><button class="star" data-n="4">😊</button><button class="star" data-n="5">🤩</button></div></div>
     </div>
+    <div class="btn-row"><button class="btn" id="btn-dia">+ Guardar entrada</button></div>
+  </div>
+  <div class="elist" id="dia-list"><div class="empty"><div class="emo">🌙</div><p>Tus entradas del diario aparecerán acá</p></div></div>
+</div>
 
-    <div class="prompt-card">
-      <div class="prompt-q">¿Qué sentí hoy?</div>
-      <textarea id="diario-sentir" placeholder="Escribí libremente: emociones, tensiones, satisfacciones..."></textarea>
+<!-- PLANIFICACIÓN -->
+<div class="sec" id="s-pla">
+  <div class="sec-hd">
+    <div class="sec-ico bggs">📋</div>
+    <div class="sec-ttl"><h2>Planificación Rápida</h2><p>Armá tu clase con claridad</p></div>
+  </div>
+  <div class="card">
+    <div class="fg">
+      <div class="field"><label>Fecha</label><input type="date" id="pla-fecha"></div>
+      <div class="field"><label>Materia</label><input type="text" id="pla-mat" placeholder="Ej: Matemática"></div>
+      <div class="field"><label>Curso</label><input type="text" id="pla-cur" placeholder="Ej: 4° A"></div>
+      <div class="field"><label>Tema</label><input type="text" id="pla-tema" placeholder="Ej: Fracciones"></div>
     </div>
-
-    <div class="prompt-card" style="background: linear-gradient(135deg, #2A3D2C 0%, #1E2E20 100%);">
-      <div class="prompt-q" style="color:var(--sage-light)">¿Qué salió bien?</div>
-      <textarea id="diario-bien" placeholder="Nombrá los logros, por pequeños que sean..."></textarea>
+    <hr>
+    <div class="pstage ps-ini">
+      <div class="plabel cs">Inicio <input type="text" class="tmin" id="pla-tini" placeholder="min"></div>
+      <textarea id="pla-ini" placeholder="Activación de conocimientos previos, pregunta disparadora..."></textarea>
     </div>
-
-    <div class="prompt-card" style="background: linear-gradient(135deg, #3A2E1A 0%, #2A2010 100%);">
-      <div class="prompt-q" style="color:var(--gold-light)">¿Qué mejoraría?</div>
-      <textarea id="diario-mejorar" placeholder="¿Qué cambiarías? ¿Qué preguntas te quedaron?"></textarea>
+    <div class="pstage ps-dev">
+      <div class="plabel cg">Desarrollo <input type="text" class="tmin" id="pla-tdev" placeholder="min"></div>
+      <textarea id="pla-dev" placeholder="Explicación, actividades principales..."></textarea>
     </div>
-
-    <div class="card">
-      <div class="card-title color-rust">
-        <div class="card-title-dot" style="background:var(--rust)"></div>
-        Guardar entrada de hoy
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Fecha</label>
-          <input type="date" id="diario-fecha">
-        </div>
-        <div class="field">
-          <label>¿Cómo me sentí en general?</label>
-          <div class="stars-row" id="diario-stars" style="margin-top:6px">
-            <button class="star-btn" onclick="setStars('diario-stars',1)">😞</button>
-            <button class="star-btn" onclick="setStars('diario-stars',2)">😐</button>
-            <button class="star-btn" onclick="setStars('diario-stars',3)">🙂</button>
-            <button class="star-btn" onclick="setStars('diario-stars',4)">😊</button>
-            <button class="star-btn" onclick="setStars('diario-stars',5)">🤩</button>
-          </div>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-add" onclick="guardarDiario()">+ Guardar entrada</button>
-      </div>
+    <div class="pstage ps-cie">
+      <div class="plabel cr">Cierre <input type="text" class="tmin" id="pla-tcie" placeholder="min"></div>
+      <textarea id="pla-cie" placeholder="Síntesis, puesta en común, tarea..."></textarea>
     </div>
-
-    <div class="entries-list" id="diario-lista">
-      <div class="empty-state">
-        <div class="emoji">🌙</div>
-        <p>Tus entradas del diario aparecerán acá</p>
-      </div>
+    <hr>
+    <div class="fg fg1">
+      <div class="field"><label>Materiales</label><textarea id="pla-mat2" placeholder="Fotocopias, proyector..." style="min-height:60px"></textarea></div>
+      <div class="field"><label>Observaciones</label><textarea id="pla-obs" placeholder="Adaptaciones, anticipaciones..." style="min-height:60px"></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btn-pla">+ Guardar planificación</button>
+      <button class="btn btn2" id="btn-pla-lim">Nueva hoja</button>
     </div>
   </div>
+  <div class="elist" id="pla-list"><div class="empty"><div class="emo">📐</div><p>Tus planificaciones aparecerán acá</p></div></div>
+</div>
 
-  <!-- ────────── PLANIFICACIÓN ────────── -->
-  <div class="section" id="planificacion">
-    <div class="section-header">
-      <div class="section-icon bg-sage-soft">📋</div>
-      <div class="section-title">
-        <h2>Planificación Rápida</h2>
-        <p>Armá tu clase con claridad</p>
-      </div>
+<!-- ESTUDIANTES -->
+<div class="sec" id="s-est">
+  <div class="sec-hd">
+    <div class="sec-ico bgls">👥</div>
+    <div class="sec-ttl"><h2>Seguimiento de Estudiantes</h2><p>Mini fichas de cada trayectoria</p></div>
+  </div>
+  <div class="card">
+    <div class="fg">
+      <div class="field"><label>Nombre</label><input type="text" id="est-nom" placeholder="Nombre del/la estudiante"></div>
+      <div class="field"><label>Curso</label><input type="text" id="est-cur" placeholder="Ej: 2° C"></div>
+      <div class="field full"><label>Participación</label><div class="star-row" id="est-stars" style="margin-top:6px"><button class="star" data-n="1">⭐</button><button class="star" data-n="2">⭐</button><button class="star" data-n="3">⭐</button><button class="star" data-n="4">⭐</button><button class="star" data-n="5">⭐</button></div></div>
+      <div class="field"><label>Fortalezas</label><textarea id="est-fort" placeholder="¿En qué se destaca?" style="min-height:70px"></textarea></div>
+      <div class="field"><label>Dificultades</label><textarea id="est-dif" placeholder="¿En qué necesita apoyo?" style="min-height:70px"></textarea></div>
+      <div class="field full"><label>Observaciones</label><textarea id="est-obs" placeholder="Contexto, situaciones especiales..." style="min-height:70px"></textarea></div>
     </div>
+    <div class="btn-row"><button class="btn" id="btn-est">+ Agregar ficha</button></div>
+  </div>
+  <div class="elist" id="est-list"><div class="empty"><div class="emo">🧑‍🎓</div><p>Las fichas aparecerán acá</p></div></div>
+</div>
 
-    <div class="card">
-      <div class="form-grid">
-        <div class="field">
-          <label>Fecha de la clase</label>
-          <input type="date" id="plan-fecha">
-        </div>
-        <div class="field">
-          <label>Materia / Área</label>
-          <input type="text" id="plan-materia" placeholder="Ej: Matemática">
-        </div>
-        <div class="field">
-          <label>Curso</label>
-          <input type="text" id="plan-curso" placeholder="Ej: 4° A">
-        </div>
-        <div class="field">
-          <label>Tema</label>
-          <input type="text" id="plan-tema" placeholder="Ej: Fracciones equivalentes">
-        </div>
-      </div>
-
-      <hr class="divider">
-
-      <div class="plan-stage inicio">
-        <div class="plan-stage-label color-sage">
-          Inicio
-          <input type="text" id="plan-tiempo-inicio" placeholder="min" style="width:60px;padding:3px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:white">
-        </div>
-        <textarea id="plan-inicio" placeholder="¿Cómo vas a captar la atención? Activación de conocimientos previos, pregunta disparadora, situación problema..."></textarea>
-      </div>
-
-      <div class="plan-stage desarrollo">
-        <div class="plan-stage-label color-gold">
-          Desarrollo
-          <input type="text" id="plan-tiempo-dev" placeholder="min" style="width:60px;padding:3px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:white">
-        </div>
-        <textarea id="plan-desarrollo" placeholder="Explicación, actividades principales, momentos de trabajo individual o grupal..."></textarea>
-      </div>
-
-      <div class="plan-stage cierre">
-        <div class="plan-stage-label color-rust">
-          Cierre
-          <input type="text" id="plan-tiempo-cierre" placeholder="min" style="width:60px;padding:3px 8px;font-size:12px;border-radius:6px;border:1px solid var(--border);background:white">
-        </div>
-        <textarea id="plan-cierre" placeholder="Síntesis, puesta en común, evaluación formativa, tarea..."></textarea>
-      </div>
-
-      <hr class="divider">
-
-      <div class="form-grid cols-1">
-        <div class="field">
-          <label>Materiales y recursos</label>
-          <textarea id="plan-materiales" placeholder="Fotocopias, proyector, cartulinas, libro de texto..." style="min-height:60px"></textarea>
-        </div>
-        <div class="field">
-          <label>Observaciones / Adaptaciones</label>
-          <textarea id="plan-obs" placeholder="Adaptaciones para estudiantes con necesidades específicas, anticipaciones ante posibles dificultades..." style="min-height:60px"></textarea>
-        </div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn-add" onclick="guardarPlan()">+ Guardar planificación</button>
-        <button class="btn-add btn-secondary" onclick="limpiarPlan()">Nueva hoja</button>
-      </div>
+<!-- INSPIRACIÓN -->
+<div class="sec" id="s-ins">
+  <div class="sec-hd">
+    <div class="sec-ico bgys">✨</div>
+    <div class="sec-ttl"><h2>Inspiración &amp; Ideas</h2><p>El espacio creativo de tu práctica</p></div>
+  </div>
+  <div class="igrid">
+    <div class="icard ic1"><h3>💡 Ideas para actividades</h3><textarea id="ins-act" placeholder="Actividades que querés probar..."></textarea></div>
+    <div class="icard ic4"><h3>📌 No olvidarme</h3><textarea id="ins-nol" placeholder="Cosas importantes..."></textarea></div>
+    <div class="icard ic3"><h3>🎨 Recursos</h3><textarea id="ins-rec" placeholder="Páginas, libros, herramientas..."></textarea></div>
+    <div class="icard ic2"><h3>🗓️ Preguntas pendientes</h3><textarea id="ins-preg" placeholder="Dudas para consultar..."></textarea></div>
+  </div>
+  <div class="card">
+    <div class="ctitle cg"><div class="cdot" style="background:var(--gold)"></div>Frases para motivarme</div>
+    <div class="flist" id="fras-list">
+      <div class="fitem"><div class="fq">"</div><div class="ftxt">Enseñar es aprender dos veces.</div><button class="bdel" data-del="frase">✕</button></div>
+      <div class="fitem"><div class="fq">"</div><div class="ftxt">El aula perfecta no existe — existe la práctica honesta.</div><button class="bdel" data-del="frase">✕</button></div>
     </div>
-
-    <div class="entries-list" id="plan-lista">
-      <div class="empty-state">
-        <div class="emoji">📐</div>
-        <p>Tus planificaciones guardadas aparecerán acá</p>
-      </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input type="text" id="ins-frase" placeholder="Agregá una frase...">
+      <button class="btn" id="btn-frase" style="white-space:nowrap">+ Agregar</button>
     </div>
   </div>
-
-  <!-- ────────── ESTUDIANTES ────────── -->
-  <div class="section" id="estudiantes">
-    <div class="section-header">
-      <div class="section-icon bg-lavender-soft">👥</div>
-      <div class="section-title">
-        <h2>Seguimiento de Estudiantes</h2>
-        <p>Mini fichas para acompañar cada trayectoria</p>
-      </div>
+  <div class="card">
+    <div class="ctitle cr"><div class="cdot" style="background:var(--rust)"></div>No olvidarme — lista</div>
+    <div class="chklist" id="chk-list">
+      <div class="chk"><div class="chkbox"></div><div class="chktxt">Preparar materiales con anticipación</div></div>
+      <div class="chk"><div class="chkbox"></div><div class="chktxt">Llegar 10 minutos antes</div></div>
+      <div class="chk"><div class="chkbox"></div><div class="chktxt">Entregar planificación al tutor/a</div></div>
     </div>
-
-    <div class="card">
-      <div class="card-title color-lavender">
-        <div class="card-title-dot" style="background:var(--lavender)"></div>
-        Agregar estudiante
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Nombre y apellido</label>
-          <input type="text" id="est-nombre" placeholder="Nombre del/la estudiante">
-        </div>
-        <div class="field">
-          <label>Curso</label>
-          <input type="text" id="est-curso" placeholder="Ej: 2° C">
-        </div>
-        <div class="field full">
-          <label>Participación (1–5)</label>
-          <div class="stars-row" id="est-stars">
-            <button class="star-btn" onclick="setStars('est-stars',1)">⭐</button>
-            <button class="star-btn" onclick="setStars('est-stars',2)">⭐</button>
-            <button class="star-btn" onclick="setStars('est-stars',3)">⭐</button>
-            <button class="star-btn" onclick="setStars('est-stars',4)">⭐</button>
-            <button class="star-btn" onclick="setStars('est-stars',5)">⭐</button>
-          </div>
-        </div>
-        <div class="field">
-          <label>Fortalezas</label>
-          <textarea id="est-fortalezas" placeholder="¿En qué se destaca?" style="min-height:70px"></textarea>
-        </div>
-        <div class="field">
-          <label>Dificultades</label>
-          <textarea id="est-dificultades" placeholder="¿En qué necesita apoyo?" style="min-height:70px"></textarea>
-        </div>
-        <div class="field full">
-          <label>Observaciones generales</label>
-          <textarea id="est-obs" placeholder="Contexto, situación especial, acuerdos..." style="min-height:70px"></textarea>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-add" onclick="guardarEstudiante()">+ Agregar ficha</button>
-      </div>
-    </div>
-
-    <div class="entries-list" id="est-lista">
-      <div class="empty-state">
-        <div class="emoji">🧑‍🎓</div>
-        <p>Las fichas de tus estudiantes aparecerán acá</p>
-      </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
+      <input type="text" id="ins-chk" placeholder="Agregar recordatorio...">
+      <button class="btn" id="btn-chk" style="white-space:nowrap">+ Agregar</button>
     </div>
   </div>
+</div>
 
-  <!-- ────────── INSPIRACIÓN ────────── -->
-  <div class="section" id="inspiracion">
-    <div class="section-header">
-      <div class="section-icon bg-gold-soft">✨</div>
-      <div class="section-title">
-        <h2>Inspiración & Ideas</h2>
-        <p>El espacio creativo de tu práctica</p>
-      </div>
-    </div>
-
-    <div class="ideas-grid">
-      <div class="idea-card ic-sage">
-        <h3><span>💡</span> Ideas para actividades</h3>
-        <textarea id="ideas-actividades" placeholder="Actividades que querés probar, recursos que viste, ideas que surgieron..."></textarea>
-      </div>
-      <div class="idea-card ic-rust">
-        <h3><span>📌</span> No olvidarme</h3>
-        <textarea id="ideas-no-olvidar" placeholder="Cosas importantes que no podés dejar pasar..."></textarea>
-      </div>
-      <div class="idea-card ic-lavender">
-        <h3><span>🎨</span> Recursos que me gustaron</h3>
-        <textarea id="ideas-recursos" placeholder="Páginas, libros, herramientas, propuestas que querés guardar..."></textarea>
-      </div>
-      <div class="idea-card ic-gold">
-        <h3><span>🗓️</span> Preguntas pendientes</h3>
-        <textarea id="ideas-preguntas" placeholder="Dudas para consultar con tu tutor/a, cosas que investigar..."></textarea>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title color-gold">
-        <div class="card-title-dot" style="background:var(--gold)"></div>
-        Frases para motivarme
-      </div>
-      <div class="frases-list" id="frases-lista">
-        <div class="frase-item">
-          <div class="frase-quote">"</div>
-          <div class="frase-text">Enseñar es aprender dos veces.</div>
-          <button class="btn-delete" onclick="this.closest('.frase-item').remove()">✕</button>
-        </div>
-        <div class="frase-item">
-          <div class="frase-quote">"</div>
-          <div class="frase-text">El aula perfecta no existe — existe la práctica honesta.</div>
-          <button class="btn-delete" onclick="this.closest('.frase-item').remove()">✕</button>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <input type="text" id="nueva-frase" placeholder="Agregá una frase que te inspire..." style="flex:1">
-        <button class="btn-add" style="white-space:nowrap" onclick="agregarFrase()">+ Agregar</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title color-rust">
-        <div class="card-title-dot" style="background:var(--rust)"></div>
-        Lista: No olvidarme
-      </div>
-      <div class="checklist" id="checklist-no-olvidar">
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"></div>
-          <div class="check-text">Preparar materiales con anticipación</div>
-        </div>
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"></div>
-          <div class="check-text">Llegar 10 minutos antes</div>
-        </div>
-        <div class="check-item" onclick="toggleCheck(this)">
-          <div class="check-box"></div>
-          <div class="check-text">Entregar planificación al tutor/a</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center;margin-top:12px">
-        <input type="text" id="nuevo-item" placeholder="Agregar recordatorio..." style="flex:1">
-        <button class="btn-add" style="white-space:nowrap" onclick="agregarCheck()">+ Agregar</button>
-      </div>
-    </div>
+<!-- APRENDIZAJES -->
+<div class="sec" id="s-apr">
+  <div class="sec-hd">
+    <div class="sec-ico bggs">🌱</div>
+    <div class="sec-ttl"><h2>Cosas que aprendí</h2><p>Tu registro de crecimiento</p></div>
   </div>
-
-  <!-- ────────── APRENDIZAJES ────────── -->
-  <div class="section" id="aprendizajes">
-    <div class="section-header">
-      <div class="section-icon bg-sage-soft">🌱</div>
-      <div class="section-title">
-        <h2>Cosas que aprendí</h2>
-        <p>Tu registro de crecimiento</p>
+  <div class="card">
+    <div class="fg">
+      <div class="field">
+        <label>Tipo</label>
+        <select id="apr-tipo">
+          <option value="aprendí|💡|var(--gold)">💡 Cosas que aprendí</option>
+          <option value="Errores|💪|var(--rust)">💪 Errores que me ayudaron</option>
+          <option value="emocionó|🌟|var(--lav)">🌟 Momento que me emocionó</option>
+          <option value="Clave|🔑|var(--sage)">🔑 Clave que descubrí</option>
+        </select>
       </div>
+      <div class="field"><label>Fecha</label><input type="date" id="apr-fecha"></div>
+      <div class="field full"><label>Descripción</label><textarea id="apr-txt" class="tall" placeholder="Contá qué aprendiste, cómo te ayudó el error..."></textarea></div>
     </div>
-
-    <div class="card">
-      <div class="card-title color-sage">
-        <div class="card-title-dot" style="background:var(--sage)"></div>
-        Registrar aprendizaje
-      </div>
-      <div class="form-grid">
-        <div class="field">
-          <label>Tipo</label>
-          <select id="ap-tipo">
-            <option value="💡 Cosas que aprendí">💡 Cosas que aprendí</option>
-            <option value="💪 Errores que me ayudaron">💪 Errores que me ayudaron</option>
-            <option value="🌟 Momento que me emocionó">🌟 Momento que me emocionó</option>
-            <option value="🔑 Clave que descubrí">🔑 Clave que descubrí</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Fecha</label>
-          <input type="date" id="ap-fecha">
-        </div>
-        <div class="field full">
-          <label>Descripción</label>
-          <textarea id="ap-texto" placeholder="Contá qué aprendiste, cómo te ayudó el error, qué descubriste..." class="tall"></textarea>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-add" onclick="guardarAprendizaje()">+ Registrar</button>
-      </div>
-    </div>
-
-    <div id="ap-lista">
-      <div class="empty-state">
-        <div class="emoji">🌿</div>
-        <p>Tus aprendizajes y descubrimientos aparecerán acá</p>
-      </div>
-    </div>
+    <div class="btn-row"><button class="btn" id="btn-apr">+ Registrar</button></div>
   </div>
+  <div id="apr-list"><div class="empty"><div class="emo">🌿</div><p>Tus aprendizajes aparecerán acá</p></div></div>
+</div>
 
 </main>
-
-<div class="footer-note">agenda de residencia docente · creado por <strong style="opacity:0.7;font-style:italic">Club Creativo</strong></div>
+<div class="foot">agenda de residencia docente · creado por <em>Club Creativo</em></div>
 
 <script>
+// UTILS
+function V(id) { return document.getElementById(id); }
+function fecha(s) { if (!s) return '-'; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+function hoy() { var d=new Date(); var dd=d.getDate()<10?'0'+d.getDate():''+d.getDate(); var mm=(d.getMonth()+1)<10?'0'+(d.getMonth()+1):''+(d.getMonth()+1); return d.getFullYear()+'-'+mm+'-'+dd; }
+function save(k,v) { try { localStorage.setItem('ag_'+k, typeof v==='string'?v:JSON.stringify(v)); } catch(e) {} }
+function load(k) { try { return localStorage.getItem('ag_'+k); } catch(e) { return null; } }
+function rmEmpty(el) { var e=el.querySelector('.empty'); if(e) e.parentNode.removeChild(e); }
 
+// TABS
+var tabs = ['obs','dia','pla','est','ins','apr'];
+tabs.forEach(function(id) {
+  V('t-'+id).addEventListener('click', function() {
+    tabs.forEach(function(x) { V('t-'+x).classList.remove('on'); V('s-'+x).classList.remove('on'); });
+    V('t-'+id).classList.add('on');
+    V('s-'+id).classList.add('on');
+  });
+});
+
+// STARS
+document.querySelectorAll('.star-row').forEach(function(row) {
+  row.setAttribute('data-val','0');
+  var stars = row.querySelectorAll('.star');
+  stars.forEach(function(star) {
+    star.addEventListener('click', function() {
+      var n = parseInt(this.getAttribute('data-n'));
+      row.setAttribute('data-val', n);
+      stars.forEach(function(s,i) {
+        if(i<n) s.classList.add('on'); else s.classList.remove('on');
+      });
+    });
+  });
+});
+function getStars(id) { return parseInt(V(id).getAttribute('data-val')) || 0; }
+function resetStars(id) { V(id).setAttribute('data-val','0'); V(id).querySelectorAll('.star').forEach(function(s){s.classList.remove('on');}); }
+
+// PILLS
+document.querySelectorAll('#obs-pills .pill').forEach(function(p) {
+  p.addEventListener('click', function() { this.classList.toggle('on'); });
+});
+function getPills() {
+  var r=[]; document.querySelectorAll('#obs-pills .pill.on').forEach(function(p){r.push(p.textContent);}); return r;
+}
+function resetPills() { document.querySelectorAll('#obs-pills .pill').forEach(function(p){p.classList.remove('on');}); }
+
+// CHECKLIST
+function bindChk(el) {
+  el.addEventListener('click', function() {
+    this.classList.toggle('done');
+    this.querySelector('.chkbox').textContent = this.classList.contains('done') ? '✓' : '';
+    saveInspiracion();
+  });
+}
+document.querySelectorAll('#chk-list .chk').forEach(bindChk);
+
+V('btn-chk').addEventListener('click', function() {
+  var v = V('ins-chk').value.trim(); if(!v) return;
+  var d = document.createElement('div'); d.className='chk';
+  d.innerHTML = '<div class="chkbox"></div><div class="chktxt">'+v+'</div>';
+  bindChk(d);
+  V('chk-list').appendChild(d);
+  V('ins-chk').value='';
+  saveInspiracion();
+});
+
+// FRASES
+function bindFrase(el) {
+  el.querySelector('.bdel').addEventListener('click', function() {
+    el.parentNode.removeChild(el); saveInspiracion();
+  });
+}
+document.querySelectorAll('#fras-list .fitem').forEach(bindFrase);
+
+V('btn-frase').addEventListener('click', function() {
+  var v = V('ins-frase').value.trim(); if(!v) return;
+  var d = document.createElement('div'); d.className='fitem';
+  d.innerHTML = '<div class="fq">"</div><div class="ftxt">'+v+'</div><button class="bdel">✕</button>';
+  bindFrase(d);
+  V('fras-list').appendChild(d);
+  V('ins-frase').value='';
+  saveInspiracion();
+});
+
+// SAVE/LOAD LISTAS
+function saveList(id) { save('list_'+id, V(id).innerHTML); }
+function loadList(id) {
+  var h = load('list_'+id); if(!h) return;
+  V(id).innerHTML = h;
+  V(id).querySelectorAll('.bdel').forEach(function(b) {
+    b.addEventListener('click', function() {
+      var p=this.parentNode; p.parentNode.removeChild(p); saveList(id);
+    });
+  });
+}
+
+// SAVE INSPIRACION
+function saveInspiracion() {
+  save('fras', V('fras-list').innerHTML);
+  save('chk', V('chk-list').innerHTML);
+  save('ins-act', V('ins-act').value);
+  save('ins-nol', V('ins-nol').value);
+  save('ins-rec', V('ins-rec').value);
+  save('ins-preg', V('ins-preg').value);
+}
+
+['ins-act','ins-nol','ins-rec','ins-preg'].forEach(function(id) {
+  V(id).addEventListener('input', saveInspiracion);
+});
+
+// OBSERVACIONES
+V('btn-obs').addEventListener('click', function() {
+  var cur=V('obs-curso').value.trim(), doc=V('obs-docente').value.trim();
+  if(!cur && !doc) { alert('Completá al menos el curso o el docente.'); return; }
+  var pills=getPills(), otro=V('obs-est-otro').value.trim();
+  if(otro) pills.push(otro);
+  var comp=V('obs-comp').value.trim(), ref=V('obs-ref').value.trim();
+  var cl=getStars('obs-clima');
+  var moods=['','😞','😐','🙂','😊','🤩'];
+  var mood=cl?moods[cl]:'';
+  var tags=''; pills.forEach(function(p){tags+='<span class="tag">'+p+'</span>';});
+  var html='<div class="ehd"><div><div class="emeta">'+fecha(V('obs-fecha').value)+' · '+(cur||'—')+'</div><strong style="font-family:\'Playfair Display\',serif;font-size:1rem">'+(doc||'Sin nombre')+'</strong>'+(mood?' <span>'+mood+'</span>':'')+'</div><button class="bdel">✕</button></div>';
+  if(tags) html+='<div class="etags">'+tags+'</div>';
+  if(comp) html+='<p class="ebody" style="margin-top:10px"><strong style="font-size:11px;opacity:.6;font-family:\'DM Mono\',monospace;text-transform:uppercase">GRUPO · </strong>'+comp+'</p>';
+  if(ref) html+='<p class="ebody" style="font-style:italic;border-left:3px solid var(--rust);padding-left:12px;margin-top:10px">'+ref+'</p>';
+  var d=document.createElement('div'); d.className='eitem'; d.innerHTML=html;
+  d.querySelector('.bdel').addEventListener('click',function(){ d.parentNode.removeChild(d); saveList('obs-list'); });
+  rmEmpty(V('obs-list')); V('obs-list').insertBefore(d,V('obs-list').firstChild);
+  V('obs-curso').value=''; V('obs-docente').value=''; V('obs-est-otro').value=''; V('obs-comp').value=''; V('obs-ref').value='';
+  resetPills(); resetStars('obs-clima');
+  saveList('obs-list');
+});
+V('btn-obs-lim').addEventListener('click', function() {
+  V('obs-curso').value=''; V('obs-docente').value=''; V('obs-est-otro').value=''; V('obs-comp').value=''; V('obs-ref').value='';
+  resetPills(); resetStars('obs-clima');
+});
+
+// DIARIO
+V('btn-dia').addEventListener('click', function() {
+  var s=V('dia-sentir').value.trim(), b=V('dia-bien').value.trim(), m=V('dia-mej').value.trim();
+  if(!s&&!b&&!m) { alert('Escribí algo antes de guardar.'); return; }
+  var est=getStars('dia-stars');
+  var moods=['','😞','😐','🙂','😊','🤩'];
+  var mood=est?moods[est]:'';
+  var html='<div class="ehd"><div class="emeta">'+fecha(V('dia-fecha').value)+(mood?' · '+mood:'')+'</div><button class="bdel">✕</button></div>';
+  if(s) html+='<p class="ebody" style="margin-bottom:8px"><span style="font-size:11px;font-family:\'DM Mono\',monospace;text-transform:uppercase;opacity:.5;display:block;margin-bottom:3px">Sentí →</span>'+s+'</p>';
+  if(b) html+='<p class="ebody" style="margin-bottom:8px"><span style="font-size:11px;font-family:\'DM Mono\',monospace;text-transform:uppercase;opacity:.5;color:var(--sage);display:block;margin-bottom:3px">Salió bien →</span>'+b+'</p>';
+  if(m) html+='<p class="ebody"><span style="font-size:11px;font-family:\'DM Mono\',monospace;text-transform:uppercase;opacity:.5;color:var(--gold);display:block;margin-bottom:3px">Mejoraría →</span>'+m+'</p>';
+  var d=document.createElement('div'); d.className='eitem'; d.style.borderLeft='3px solid var(--gold)'; d.innerHTML=html;
+  d.querySelector('.bdel').addEventListener('click',function(){ d.parentNode.removeChild(d); saveList('dia-list'); });
+  rmEmpty(V('dia-list')); V('dia-list').insertBefore(d,V('dia-list').firstChild);
+  V('dia-sentir').value=''; V('dia-bien').value=''; V('dia-mej').value='';
+  resetStars('dia-stars');
+  saveList('dia-list');
+});
+
+// PLANIFICACION
+V('btn-pla').addEventListener('click', function() {
+  var mat=V('pla-mat').value.trim(), tema=V('pla-tema').value.trim();
+  if(!mat&&!tema) { alert('Completá al menos la materia o el tema.'); return; }
+  var cur=V('pla-cur').value.trim(), ini=V('pla-ini').value.trim(), tini=V('pla-tini').value.trim();
+  var dev=V('pla-dev').value.trim(), tdev=V('pla-tdev').value.trim();
+  var cie=V('pla-cie').value.trim(), tcie=V('pla-tcie').value.trim();
+  var mat2=V('pla-mat2').value.trim();
+  var html='<div class="ehd"><div><div class="emeta">'+fecha(V('pla-fecha').value)+' · '+(cur||'—')+'</div><strong style="font-family:\'Playfair Display\',serif;font-size:1.05rem">'+(mat||'—')+' — '+(tema||'Sin tema')+'</strong></div><button class="bdel">✕</button></div><div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">';
+  if(ini) html+='<div style="border-left:3px solid var(--sage);padding-left:12px"><span style="font-size:10px;font-family:\'DM Mono\',monospace;text-transform:uppercase;color:var(--sage);display:block;margin-bottom:3px">Inicio'+(tini?' · '+tini+' min':'')+'</span><span class="ebody">'+ini+'</span></div>';
+  if(dev) html+='<div style="border-left:3px solid var(--gold);padding-left:12px"><span style="font-size:10px;font-family:\'DM Mono\',monospace;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:3px">Desarrollo'+(tdev?' · '+tdev+' min':'')+'</span><span class="ebody">'+dev+'</span></div>';
+  if(cie) html+='<div style="border-left:3px solid var(--rust);padding-left:12px"><span style="font-size:10px;font-family:\'DM Mono\',monospace;text-transform:uppercase;color:var(--rust);display:block;margin-bottom:3px">Cierre'+(tcie?' · '+tcie+' min':'')+'</span><span class="ebody">'+cie+'</span></div>';
+  if(mat2) html+='<div><span style="font-size:10px;font-family:\'DM Mono\',monospace;opacity:.5;text-transform:uppercase">Materiales: </span><span class="ebody">'+mat2+'</span></div>';
+  html+='</div>';
+  var d=document.createElement('div'); d.className='eitem'; d.innerHTML=html;
+  d.querySelector('.bdel').addEventListener('click',function(){ d.parentNode.removeChild(d); saveList('pla-list'); });
+  rmEmpty(V('pla-list')); V('pla-list').insertBefore(d,V('pla-list').firstChild);
+  V('btn-pla-lim').click();
+  saveList('pla-list');
+});
+V('btn-pla-lim').addEventListener('click', function() {
+  ['pla-mat','pla-cur','pla-tema','pla-ini','pla-tini','pla-dev','pla-tdev','pla-cie','pla-tcie','pla-mat2','pla-obs'].forEach(function(id){ V(id).value=''; });
+});
+
+// ESTUDIANTES
+V('btn-est').addEventListener('click', function() {
+  var nom=V('est-nom').value.trim();
+  if(!nom) { alert('Escribí el nombre del/la estudiante.'); return; }
+  var cur=V('est-cur').value.trim(), part=getStars('est-stars');
+  var fort=V('est-fort').value.trim(), dif=V('est-dif').value.trim(), obs=V('est-obs').value.trim();
+  var stars=''; for(var i=0;i<part;i++) stars+='⭐';
+  var html='<div class="ehd"><strong style="font-family:\'Playfair Display\',serif;font-size:1.1rem">'+nom+'</strong><button class="bdel">✕</button></div><div class="emeta" style="margin-top:4px">'+(cur||'—')+(stars?' · '+stars:'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">';
+  if(fort) html+='<div><div class="mlabel">Fortalezas</div><div class="mtext" style="color:var(--sage)">'+fort+'</div></div>';
+  if(dif) html+='<div><div class="mlabel">Dificultades</div><div class="mtext" style="color:var(--rust)">'+dif+'</div></div>';
+  html+='</div>';
+  if(obs) html+='<p class="ebody" style="margin-top:10px;font-size:13px;opacity:.75">'+obs+'</p>';
+  var d=document.createElement('div'); d.className='eitem'; d.innerHTML=html;
+  d.querySelector('.bdel').addEventListener('click',function(){ d.parentNode.removeChild(d); saveList('est-list'); });
+  rmEmpty(V('est-list')); V('est-list').insertBefore(d,V('est-list').firstChild);
+  ['est-nom','est-cur','est-fort','est-dif','est-obs'].forEach(function(id){ V(id).value=''; });
+  resetStars('est-stars');
+  saveList('est-list');
+});
+
+// APRENDIZAJES
+V('btn-apr').addEventListener('click', function() {
+  var txt=V('apr-txt').value.trim();
+  if(!txt) { alert('Escribí algo antes de guardar.'); return; }
+  var sel=V('apr-tipo').value.split('|');
+  var label=sel[0], emoji=sel[1], color=sel[2];
+  var d=document.createElement('div'); d.className='aitem'; d.style.borderLeft='3px solid '+color;
+  d.innerHTML='<div class="aico">'+emoji+'</div><div class="abody"><div class="atype" style="color:'+color+'">'+label+' · '+fecha(V('apr-fecha').value)+'</div><div class="atxt">'+txt+'</div></div><button class="bdel">✕</button>';
+  d.querySelector('.bdel').addEventListener('click',function(){ d.parentNode.removeChild(d); saveList('apr-list'); });
+  rmEmpty(V('apr-list')); V('apr-list').insertBefore(d,V('apr-list').firstChild);
+  V('apr-txt').value='';
+  saveList('apr-list');
+});
+
+// REGISTRO con prompt nativo
+function registro() {
+  try {
+    var nombre = localStorage.getItem('ag_usuaria');
+    if (!nombre) {
+      nombre = window.prompt('Bienvenida!\n\nEscribí tu nombre para empezar:');
+      if (nombre && nombre.trim()) {
+        localStorage.setItem('ag_usuaria', nombre.trim());
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST','https://formspree.io/f/mvzlykzo',true);
+          xhr.setRequestHeader('Content-Type','application/json');
+          xhr.setRequestHeader('Accept','application/json');
+          var d=new Date();
+          xhr.send(JSON.stringify({nombre:nombre.trim(),fecha:d.toLocaleDateString(),hora:d.toLocaleTimeString()}));
+        } catch(e2) {}
+      }
+    }
   } catch(e) {}
 }
 
-// ── STORAGE ──
-function dbGet(key) {
-  try { return JSON.parse(localStorage.getItem('agenda_' + key)) || null; }
-  catch(e) { return null; }
-}
-function dbSet(key, val) {
-  try { localStorage.setItem('agenda_' + key, JSON.stringify(val)); } catch(e) {}
-}
-
-// ── PERSISTENCIA ──
-function persistirListas() {
-  var ids = ['obs-lista','diario-lista','plan-lista','est-lista','ap-lista'];
-  for (var i = 0; i < ids.length; i++) {
-    var el = document.getElementById(ids[i]);
-    if (el) dbSet('lista_' + ids[i], el.innerHTML);
-  }
-}
-
-function persistirInspiracion() {
-  dbSet('frases', document.getElementById('frases-lista').innerHTML);
-  dbSet('checklist', document.getElementById('checklist-no-olvidar').innerHTML);
-  var ideas = ['ideas-actividades','ideas-no-olvidar','ideas-recursos','ideas-preguntas'];
-  for (var i = 0; i < ideas.length; i++) {
-    var el = document.getElementById(ideas[i]);
-    if (el) dbSet('textarea_' + ideas[i], el.value);
-  }
-}
-
-function reactivarBorrar(id) {
-  var btns = document.querySelectorAll('#' + id + ' .btn-delete');
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].onclick = function() {
-      var p = this.parentNode;
-      while (p && p.className.indexOf('entry-item') === -1 && p.className.indexOf('aprendizaje-item') === -1) {
-        p = p.parentNode;
-      }
-      if (p) p.parentNode.removeChild(p);
-      persistirListas();
-    };
-  }
-}
-
-function restaurarDatos() {
-  var listas = ['obs-lista','diario-lista','plan-lista','est-lista','ap-lista'];
-  for (var i = 0; i < listas.length; i++) {
-    var html = dbGet('lista_' + listas[i]);
-    if (html) {
-      var el = document.getElementById(listas[i]);
-      if (el) { el.innerHTML = html; reactivarBorrar(listas[i]); }
-    }
-  }
-  var frases = dbGet('frases');
-  if (frases) {
-    document.getElementById('frases-lista').innerHTML = frases;
-    var fbtns = document.querySelectorAll('#frases-lista .btn-delete');
-    for (var j = 0; j < fbtns.length; j++) {
-      fbtns[j].onclick = function() {
-        var p = this.parentNode;
-        p.parentNode.removeChild(p);
-        persistirInspiracion();
-      };
-    }
-  }
-  var check = dbGet('checklist');
-  if (check) {
-    document.getElementById('checklist-no-olvidar').innerHTML = check;
-    var citems = document.querySelectorAll('#checklist-no-olvidar .check-item');
-    for (var k = 0; k < citems.length; k++) {
-      citems[k].onclick = function() { toggleCheck(this); persistirInspiracion(); };
-    }
-  }
-  var ideas = ['ideas-actividades','ideas-no-olvidar','ideas-recursos','ideas-preguntas'];
-  for (var m = 0; m < ideas.length; m++) {
-    var val = dbGet('textarea_' + ideas[m]);
-    var iel = document.getElementById(ideas[m]);
-    if (val !== null && iel) iel.value = val;
-  }
-}
-
-function bindIdeasTextareas() {
-  var ideas = ['ideas-actividades','ideas-no-olvidar','ideas-recursos','ideas-preguntas'];
-  for (var i = 0; i < ideas.length; i++) {
-    (function(id) {
-      var el = document.getElementById(id);
-      if (el) el.addEventListener('input', function() { persistirInspiracion(); });
-    })(ideas[i]);
-  }
-}
-
-// ── TABS ──
-function showTab(id, el) {
-  var sections = document.querySelectorAll('.section');
-  for (var i = 0; i < sections.length; i++) sections[i].classList.remove('active');
-  var tabs = document.querySelectorAll('.tab-btn');
-  for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
-  document.getElementById(id).classList.add('active');
-  if (el) el.classList.add('active');
-}
-
-// ── PILLS ──
-function togglePill(el) { el.classList.toggle('selected'); }
-
-// ── STARS ──
-function setStars(groupId, n) {
-  var group = document.getElementById(groupId);
-  var btns = group.querySelectorAll('.star-btn');
-  for (var i = 0; i < btns.length; i++) {
-    if (i < n) btns[i].classList.add('active');
-    else btns[i].classList.remove('active');
-  }
-  group.setAttribute('data-value', n);
-}
-
-function getStars(groupId) {
-  var group = document.getElementById(groupId);
-  return group ? (group.getAttribute('data-value') || 0) : 0;
-}
-
-function getSelectedPills(containerId) {
-  var pills = document.querySelectorAll('#' + containerId + ' .pill.selected');
-  var result = [];
-  for (var i = 0; i < pills.length; i++) result.push(pills[i].textContent);
-  return result;
-}
-
-// ── CHECKLIST ──
-function toggleCheck(el) {
-  el.classList.toggle('done');
-  var box = el.querySelector('.check-box');
-  box.textContent = el.classList.contains('done') ? '✓' : '';
-}
-
-function agregarCheck() {
-  var input = document.getElementById('nuevo-item');
-  var val = input.value.trim();
-  if (!val) return;
-  var list = document.getElementById('checklist-no-olvidar');
-  var item = document.createElement('div');
-  item.className = 'check-item';
-  item.innerHTML = '<div class="check-box"></div><div class="check-text">'+val+'</div>';
-  item.onclick = function() { toggleCheck(this); persistirInspiracion(); };
-  list.appendChild(item);
-  input.value = '';
-  persistirInspiracion();
-}
-
-// ── FRASES ──
-function agregarFrase() {
-  var input = document.getElementById('nueva-frase');
-  var val = input.value.trim();
-  if (!val) return;
-  var list = document.getElementById('frases-lista');
-  var item = document.createElement('div');
-  item.className = 'frase-item';
-  item.innerHTML = '<div class="frase-quote">"</div><div class="frase-text">'+val+'</div><button class="btn-delete">\u2715</button>';
-  item.querySelector('.btn-delete').onclick = function() {
-    item.parentNode.removeChild(item);
-    persistirInspiracion();
-  };
-  list.appendChild(item);
-  input.value = '';
-  persistirInspiracion();
-}
-
-// ── FECHA ──
-function fmtFecha(dateStr) {
-  if (!dateStr) return '—';
-  var parts = dateStr.split('-');
-  return parts[2]+'/'+parts[1]+'/'+parts[0];
-}
-
-function clearEmpty(listEl) {
-  var emp = listEl.querySelector('.empty-state');
-  if (emp) emp.parentNode.removeChild(emp);
-}
-
-function setDefaultDates() {
-  var today = new Date();
-  var dd = today.getDate() < 10 ? '0'+today.getDate() : ''+today.getDate();
-  var mm = (today.getMonth()+1) < 10 ? '0'+(today.getMonth()+1) : ''+(today.getMonth()+1);
-  var yyyy = today.getFullYear();
-  var val = yyyy+'-'+mm+'-'+dd;
-  var inputs = document.querySelectorAll('input[type=date]');
-  for (var i = 0; i < inputs.length; i++) inputs[i].value = val;
-}
-
-// ── OBSERVACIONES ──
-function guardarObservacion() {
-  var fecha = document.getElementById('obs-fecha').value;
-  var curso = document.getElementById('obs-curso').value.trim();
-  var docente = document.getElementById('obs-docente').value.trim();
-  var estrategiasArr = getSelectedPills('estrategias-pills');
-  var estCustom = document.getElementById('obs-estrategias-custom').value.trim();
-  var all = estrategiasArr.slice();
-  if (estCustom) all.push(estCustom);
-  var comportamiento = document.getElementById('obs-comportamiento').value.trim();
-  var reflexion = document.getElementById('obs-reflexion').value.trim();
-  var clima = getStars('clima-stars');
-  if (!curso && !docente) { alert('Completá al menos el curso o el docente.'); return; }
-  var lista = document.getElementById('obs-lista');
-  clearEmpty(lista);
-  var moods = ['','😞','😐','🙂','😊','🤩'];
-  var mood = clima ? moods[clima] : '';
-  var tags = '';
-  for (var i = 0; i < all.length; i++) tags += '<span class="tag">'+all[i]+'</span>';
-  var html = '<div class="entry-header"><div><div class="entry-meta">'+fmtFecha(fecha)+' · '+(curso||'—')+'</div><strong style="font-family:'Playfair Display',serif;font-size:1rem">'+(docente||'Sin nombre')+'</strong>'+(mood?'<span style="margin-left:8px;font-size:1.1rem">'+mood+'</span>':'')+'</div><button class="btn-delete">&#x2715;</button></div>';
-  if (all.length) html += '<div class="entry-tags">'+tags+'</div>';
-  if (comportamiento) html += '<p class="entry-body" style="margin-top:10px"><strong style="font-size:11px;opacity:.6;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase">GRUPO · </strong>'+comportamiento+'</p>';
-  if (reflexion) html += '<p class="entry-body" style="font-style:italic;border-left:3px solid var(--rust);padding-left:12px;margin-top:10px">'+reflexion+'</p>';
-  var item = document.createElement('div');
-  item.className = 'entry-item';
-  item.innerHTML = html;
-  item.querySelector('.btn-delete').onclick = function() { item.parentNode.removeChild(item); persistirListas(); };
-  lista.insertBefore(item, lista.firstChild);
-  limpiarObservacion();
-  persistirListas();
-}
-
-function limpiarObservacion() {
-  document.getElementById('obs-curso').value = '';
-  document.getElementById('obs-docente').value = '';
-  document.getElementById('obs-estrategias-custom').value = '';
-  document.getElementById('obs-comportamiento').value = '';
-  document.getElementById('obs-reflexion').value = '';
-  var pills = document.querySelectorAll('#estrategias-pills .pill');
-  for (var i = 0; i < pills.length; i++) pills[i].classList.remove('selected');
-  var stars = document.querySelectorAll('#clima-stars .star-btn');
-  for (var j = 0; j < stars.length; j++) stars[j].classList.remove('active');
-}
-
-// ── DIARIO ──
-function guardarDiario() {
-  var fecha = document.getElementById('diario-fecha').value;
-  var sentir = document.getElementById('diario-sentir').value.trim();
-  var bien = document.getElementById('diario-bien').value.trim();
-  var mejorar = document.getElementById('diario-mejorar').value.trim();
-  var estado = getStars('diario-stars');
-  if (!sentir && !bien && !mejorar) { alert('Escribí algo antes de guardar.'); return; }
-  var lista = document.getElementById('diario-lista');
-  clearEmpty(lista);
-  var moods = ['','😞','😐','🙂','😊','🤩'];
-  var mood = estado ? moods[estado] : '';
-  var html = '<div class="entry-header"><div class="entry-meta">'+fmtFecha(fecha)+(mood?' · '+mood:'')+'</div><button class="btn-delete">&#x2715;</button></div>';
-  if (sentir) html += '<p class="entry-body" style="margin-bottom:8px"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;display:block;margin-bottom:3px">Sentí →</span>'+sentir+'</p>';
-  if (bien) html += '<p class="entry-body" style="margin-bottom:8px"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;color:var(--sage);display:block;margin-bottom:3px">Salió bien →</span>'+bien+'</p>';
-  if (mejorar) html += '<p class="entry-body"><span style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;opacity:.5;color:var(--gold);display:block;margin-bottom:3px">Mejoraría →</span>'+mejorar+'</p>';
-  var item = document.createElement('div');
-  item.className = 'entry-item';
-  item.style.borderLeft = '3px solid var(--gold)';
-  item.innerHTML = html;
-  item.querySelector('.btn-delete').onclick = function() { item.parentNode.removeChild(item); persistirListas(); };
-  lista.insertBefore(item, lista.firstChild);
-  document.getElementById('diario-sentir').value = '';
-  document.getElementById('diario-bien').value = '';
-  document.getElementById('diario-mejorar').value = '';
-  var dstars = document.querySelectorAll('#diario-stars .star-btn');
-  for (var i = 0; i < dstars.length; i++) dstars[i].classList.remove('active');
-  persistirListas();
-}
-
-// ── PLANIFICACIÓN ──
-function guardarPlan() {
-  var fecha = document.getElementById('plan-fecha').value;
-  var materia = document.getElementById('plan-materia').value.trim();
-  var curso = document.getElementById('plan-curso').value.trim();
-  var tema = document.getElementById('plan-tema').value.trim();
-  var inicio = document.getElementById('plan-inicio').value.trim();
-  var tInicio = document.getElementById('plan-tiempo-inicio').value.trim();
-  var dev = document.getElementById('plan-desarrollo').value.trim();
-  var tDev = document.getElementById('plan-tiempo-dev').value.trim();
-  var cierre = document.getElementById('plan-cierre').value.trim();
-  var tCierre = document.getElementById('plan-tiempo-cierre').value.trim();
-  var materiales = document.getElementById('plan-materiales').value.trim();
-  if (!materia && !tema) { alert('Completá al menos la materia o el tema.'); return; }
-  var lista = document.getElementById('plan-lista');
-  clearEmpty(lista);
-  var html = '<div class="entry-header"><div><div class="entry-meta">'+fmtFecha(fecha)+' · '+(curso||'—')+'</div><strong style="font-family:'Playfair Display',serif;font-size:1.05rem">'+(materia||'—')+' — '+(tema||'Sin tema')+'</strong></div><button class="btn-delete">&#x2715;</button></div><div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">';
-  if (inicio) html += '<div style="border-left:3px solid var(--sage);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--sage);display:block;margin-bottom:3px">Inicio'+(tInicio?' · '+tInicio+' min':'')+'</span><span class="entry-body">'+inicio+'</span></div>';
-  if (dev) html += '<div style="border-left:3px solid var(--gold);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:3px">Desarrollo'+(tDev?' · '+tDev+' min':'')+'</span><span class="entry-body">'+dev+'</span></div>';
-  if (cierre) html += '<div style="border-left:3px solid var(--rust);padding-left:12px"><span style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--rust);display:block;margin-bottom:3px">Cierre'+(tCierre?' · '+tCierre+' min':'')+'</span><span class="entry-body">'+cierre+'</span></div>';
-  if (materiales) html += '<div style="margin-top:4px"><span style="font-size:10px;font-family:'DM Mono',monospace;opacity:.5;letter-spacing:.1em;text-transform:uppercase">Materiales: </span><span class="entry-body">'+materiales+'</span></div>';
-  html += '</div>';
-  var item = document.createElement('div');
-  item.className = 'entry-item';
-  item.innerHTML = html;
-  item.querySelector('.btn-delete').onclick = function() { item.parentNode.removeChild(item); persistirListas(); };
-  lista.insertBefore(item, lista.firstChild);
-  limpiarPlan();
-  persistirListas();
-}
-
-function limpiarPlan() {
-  var ids = ['plan-materia','plan-curso','plan-tema','plan-inicio','plan-tiempo-inicio','plan-desarrollo','plan-tiempo-dev','plan-cierre','plan-tiempo-cierre','plan-materiales','plan-obs'];
-  for (var i = 0; i < ids.length; i++) {
-    var el = document.getElementById(ids[i]);
-    if (el) el.value = '';
-  }
-}
-
-// ── ESTUDIANTES ──
-function guardarEstudiante() {
-  var nombre = document.getElementById('est-nombre').value.trim();
-  var curso = document.getElementById('est-curso').value.trim();
-  var participacion = getStars('est-stars');
-  var fortalezas = document.getElementById('est-fortalezas').value.trim();
-  var dificultades = document.getElementById('est-dificultades').value.trim();
-  var obs = document.getElementById('est-obs').value.trim();
-  if (!nombre) { alert('Escribí el nombre del/la estudiante.'); return; }
-  var lista = document.getElementById('est-lista');
-  clearEmpty(lista);
-  var stars = '';
-  for (var s = 0; s < Number(participacion); s++) stars += '⭐';
-  var html = '<div class="entry-header"><strong style="font-family:'Playfair Display',serif;font-size:1.1rem">'+nombre+'</strong><button class="btn-delete">&#x2715;</button></div><div class="entry-meta" style="margin-top:4px">'+(curso||'—')+(stars?' · Participación: '+stars:'')+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">';
-  if (fortalezas) html += '<div><div class="mini-label">Fortalezas</div><div class="mini-text" style="color:var(--sage)">'+fortalezas+'</div></div>';
-  if (dificultades) html += '<div><div class="mini-label">Dificultades</div><div class="mini-text" style="color:var(--rust)">'+dificultades+'</div></div>';
-  html += '</div>';
-  if (obs) html += '<p class="entry-body" style="margin-top:10px;font-size:13px;opacity:.75">'+obs+'</p>';
-  var item = document.createElement('div');
-  item.className = 'entry-item';
-  item.innerHTML = html;
-  item.querySelector('.btn-delete').onclick = function() { item.parentNode.removeChild(item); persistirListas(); };
-  lista.insertBefore(item, lista.firstChild);
-  var clearIds = ['est-nombre','est-curso','est-fortalezas','est-dificultades','est-obs'];
-  for (var i = 0; i < clearIds.length; i++) document.getElementById(clearIds[i]).value = '';
-  var estars = document.querySelectorAll('#est-stars .star-btn');
-  for (var j = 0; j < estars.length; j++) estars[j].classList.remove('active');
-  persistirListas();
-}
-
-// ── APRENDIZAJES ──
-function guardarAprendizaje() {
-  var tipo = document.getElementById('ap-tipo').value;
-  var fecha = document.getElementById('ap-fecha').value;
-  var texto = document.getElementById('ap-texto').value.trim();
-  if (!texto) { alert('Escribí algo antes de guardar.'); return; }
-  var lista = document.getElementById('ap-lista');
-  clearEmpty(lista);
-  var color = 'var(--ink)';
-  if (tipo.indexOf('aprendí') !== -1 || tipo.indexOf('aprendi') !== -1) color = 'var(--gold)';
-  else if (tipo.indexOf('Errores') !== -1) color = 'var(--rust)';
-  else if (tipo.indexOf('emocion') !== -1 || tipo.indexOf('emocionó') !== -1) color = 'var(--lavender)';
-  else if (tipo.indexOf('Clave') !== -1) color = 'var(--sage)';
-  var parts = tipo.split(' ');
-  var emoji = parts[0];
-  var label = parts.slice(1).join(' ');
-  var item = document.createElement('div');
-  item.className = 'aprendizaje-item';
-  item.style.borderLeft = '3px solid '+color;
-  item.innerHTML = '<div class="ap-icon">'+emoji+'</div><div class="ap-body"><div class="ap-type" style="color:'+color+'">'+label+' · '+fmtFecha(fecha)+'</div><div class="ap-text">'+texto+'</div></div><button class="btn-delete">&#x2715;</button>';
-  item.querySelector('.btn-delete').onclick = function() { item.parentNode.removeChild(item); persistirListas(); };
-  lista.insertBefore(item, lista.firstChild);
-  document.getElementById('ap-texto').value = '';
-  persistirListas();
-}
-
-// ── INIT ──
+// INIT
 window.onload = function() {
-  try { setDefaultDates(); } catch(e) {}
-  try { restaurarDatos(); } catch(e) {}
-  try { bindIdeasTextareas(); } catch(e) {}
+  // Fechas de hoy
+  var h = hoy();
+  ['obs-fecha','dia-fecha','pla-fecha','apr-fecha'].forEach(function(id){ V(id).value=h; });
+
+  // Cargar listas guardadas
+  ['obs-list','dia-list','pla-list','est-list','apr-list'].forEach(loadList);
+
+  // Inspiracion
   try {
-    var usuaria = localStorage.getItem('agenda_usuaria');
-    if (!usuaria) {
-      var nombre = prompt('Bienvenida a tu Agenda de Residencia \n\nEscribí tu nombre para continuar:');
-      if (nombre && nombre.trim() !== '') {
-        localStorage.setItem('agenda_usuaria', nombre.trim());
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'https://formspree.io/f/mvzlykzo', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('Accept', 'application/json');
-        var ahora = new Date();
-        var dia = ahora.getDate() < 10 ? '0'+ahora.getDate() : ''+ahora.getDate();
-        var mes = (ahora.getMonth()+1) < 10 ? '0'+(ahora.getMonth()+1) : ''+(ahora.getMonth()+1);
-        var anio = ahora.getFullYear();
-        var hh = ahora.getHours() < 10 ? '0'+ahora.getHours() : ''+ahora.getHours();
-        var mm = ahora.getMinutes() < 10 ? '0'+ahora.getMinutes() : ''+ahora.getMinutes();
-        xhr.send(JSON.stringify({nombre: nombre.trim(), fecha: dia+'/'+mes+'/'+anio, hora: hh+':'+mm}));
-      }
-    }
-  } catch(e) {};
+    var fr=load('fras'); if(fr) { V('fras-list').innerHTML=fr; V('fras-list').querySelectorAll('.fitem').forEach(bindFrase); }
+    var ch=load('chk'); if(ch) { V('chk-list').innerHTML=ch; V('chk-list').querySelectorAll('.chk').forEach(bindChk); }
+    var ia=load('ins-act'); if(ia) V('ins-act').value=ia;
+    var in2=load('ins-nol'); if(in2) V('ins-nol').value=in2;
+    var ir=load('ins-rec'); if(ir) V('ins-rec').value=ir;
+    var ip=load('ins-preg'); if(ip) V('ins-preg').value=ip;
+  } catch(e) {}
+
+  // Registro al final, despues de cargar todo
+  setTimeout(registro, 800);
+};
 </script>
 </body>
 </html>
