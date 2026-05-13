@@ -1359,10 +1359,13 @@ function registrarUsuaria() {
 }
 
 function verificarRegistro() {
-  var nombre = localStorage.getItem('agenda_usuaria');
-  if (nombre) {
-    document.getElementById('registro-overlay').style.display = 'none';
-  }
+  try {
+    var nombre = localStorage.getItem('agenda_usuaria');
+    if (nombre) {
+      var overlay = document.getElementById('registro-overlay');
+      if (overlay) overlay.style.display = 'none';
+    }
+  } catch(e) {}
 }
 
 // ── STORAGE ──
@@ -1722,16 +1725,18 @@ function guardarAprendizaje() {
 
 // ── INIT ──
 window.onload = function() {
-  setDefaultDates();
-  verificarRegistro();
-  restaurarDatos();
-  bindIdeasTextareas();
-  var regInput = document.getElementById('reg-nombre');
-  if (regInput) {
-    regInput.addEventListener('keydown', function(e) {
-      if (e.keyCode === 13) registrarUsuaria();
-    });
-  }
+  try { setDefaultDates(); } catch(e) {}
+  try { verificarRegistro(); } catch(e) {}
+  try { restaurarDatos(); } catch(e) {}
+  try { bindIdeasTextareas(); } catch(e) {}
+  try {
+    var regInput = document.getElementById('reg-nombre');
+    if (regInput) {
+      regInput.addEventListener('keydown', function(e) {
+        if (e.keyCode === 13) registrarUsuaria();
+      });
+    }
+  } catch(e) {}
 };
 </script>
 </body>
