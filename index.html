@@ -885,13 +885,15 @@
   <div class="registro-box">
     <span class="registro-emoji">📓</span>
     <h2>Bienvenida a tu<br><em>Agenda</em></h2>
-    <p>Antes de empezar, escribí tu nombre. Solo se registra para saber quién usa la agenda — tu contenido es completamente privado.</p>
-    <div class="registro-field">
-      <label>Tu nombre completo</label>
-      <input type="text" id="reg-nombre" placeholder="Ej: María González" autocomplete="name" />
-    </div>
-    <div class="registro-error" id="reg-error">Por favor escribí tu nombre para continuar.</div>
-    <button class="btn-registro" id="reg-btn">Entrar a mi agenda →</button>
+    <p>Escribí tu nombre y tocá <strong>Listo</strong> en el teclado.</p>
+    <form id="reg-form" action="javascript:void(0)" onsubmit="registrarUsuaria()">
+      <div class="registro-field">
+        <label>Tu nombre completo</label>
+        <input type="text" id="reg-nombre" placeholder="Ej: María González" autocomplete="name" autocorrect="off" />
+      </div>
+      <div class="registro-error" id="reg-error">Por favor escribí tu nombre para continuar.</div>
+      <input type="submit" class="btn-registro" id="reg-btn" value="Entrar a mi agenda →" />
+    </form>
     <p class="registro-nota">Solo se registra tu nombre y la fecha de acceso.<br>Tu agenda es completamente privada.</p>
   </div>
 </div>
