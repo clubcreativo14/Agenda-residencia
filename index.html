@@ -891,7 +891,7 @@
       <input type="text" id="reg-nombre" placeholder="Ej: María González" autocomplete="name" />
     </div>
     <div class="registro-error" id="reg-error">Por favor escribí tu nombre para continuar.</div>
-    <button class="btn-registro" id="reg-btn" onclick="registrarUsuaria()">Entrar a mi agenda →</button>
+    <button class="btn-registro" id="reg-btn">Entrar a mi agenda →</button>
     <p class="registro-nota">Solo se registra tu nombre y la fecha de acceso.<br>Tu agenda es completamente privada.</p>
   </div>
 </div>
@@ -1729,14 +1729,24 @@ window.onload = function() {
   try { verificarRegistro(); } catch(e) {}
   try { restaurarDatos(); } catch(e) {}
   try { bindIdeasTextareas(); } catch(e) {}
-  try {
-    var regInput = document.getElementById('reg-nombre');
-    if (regInput) {
-      regInput.addEventListener('keydown', function(e) {
-        if (e.keyCode === 13) registrarUsuaria();
-      });
-    }
-  } catch(e) {}
+
+  var btn = document.getElementById('reg-btn');
+  if (btn) {
+    btn.addEventListener('click', function() {
+      registrarUsuaria();
+    });
+    btn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      registrarUsuaria();
+    });
+  }
+
+  var regInput = document.getElementById('reg-nombre');
+  if (regInput) {
+    regInput.addEventListener('keydown', function(e) {
+      if (e.keyCode === 13) registrarUsuaria();
+    });
+  }
 };
 </script>
 </body>
